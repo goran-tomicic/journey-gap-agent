@@ -2,6 +2,25 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/html-report
+Visual HTML report output alongside the existing markdown report.
+
+- Reworked the Claude call to use tool-use (forced structured output) instead
+  of asking the model to write raw JSON as text — the earlier approach
+  occasionally produced malformed JSON (unescaped characters in generated
+  text); tool-use makes the API responsible for valid encoding.
+- `src/types.ts` / `src/render.ts` — shared report data model, plus separate
+  markdown and HTML renderers built from the same structured data.
+- HTML output renders the journey as a vertical timeline: step cards
+  connected by arrows, dashed red connectors for gaps/channel mismatches,
+  and warning badges on steps with ownership conflicts. Supports light/dark
+  mode.
+- Output format is inferred from the `--output` file extension, or set with
+  `--format md|html`.
+- Added a sanity check that warns if the model's returned step count doesn't
+  match the input (guards against occasional hallucinated/duplicated steps).
+- Verified against the live API across multiple runs for both formats.
+
 ## feature/core-gap-agent
 Core CLI agent (Node/TypeScript): reads a touchpoint CSV, sends it to Claude
 to sequence the journey and flag gaps, ownership conflicts, and channel

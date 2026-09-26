@@ -10,10 +10,16 @@ conflicts, and channel mismatches, with reasoning shown for each flag.
 ## Usage
 ```
 npm start -- --input data/journey.csv --output report.md
+npm start -- --input data/journey.csv --output report.html
 ```
-Omit `--output` to print the report to stdout instead. `--model` overrides
-the Claude model (defaults to `CLAUDE_MODEL` from `.env`, then
-`claude-sonnet-5`).
+Output format is inferred from the `--output` extension (`.md` or `.html`),
+or set explicitly with `--format md|html`. Omit `--output` to print the
+markdown report to stdout instead. `--model` overrides the Claude model
+(defaults to `CLAUDE_MODEL` from `.env`, then `claude-sonnet-5`).
+
+The HTML report renders the journey as a visual timeline: step cards
+connected by arrows, with broken/dashed red connectors for gaps and channel
+mismatches, and warning badges on steps with ownership conflicts.
 
 ## Input format
 A CSV with one row per touchpoint/step:
