@@ -37,3 +37,6 @@ Thumbs.db
 # Claude / internal docs
 CLAUDE.md
 docs/SPEC.md
+
+# Generated output
+report.md
