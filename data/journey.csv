@@ -1,0 +1,11 @@
+step_name,owning_team,channel,description
+Discovery call,Sales,Call,Initial call to understand prospect needs and pain points
+Proposal sent,Sales,Email,Pricing and contract proposal sent to prospect
+Contract signed,Sales,Email,Prospect signs contract via e-signature
+Kickoff call held,Onboarding,Call,Onboarding team introduces implementation plan and timeline
+Data migration,Onboarding / Support,Internal Tool,Customer's existing data imported into the platform
+Account provisioned,Product,Internal Tool,Technical account and workspace setup completed
+First login,Product,App,Customer logs into the app for the first time
+Feature adoption check-in,,Call,Follow-up call to review feature usage and answer questions
+First support ticket,Support,Email,Customer submits a question via email
+Quarterly renewal conversation,Sales,Call,Renewal and expansion conversation with the customer
