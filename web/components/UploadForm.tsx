@@ -31,21 +31,18 @@ export default function UploadForm() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Source of truth for network progress; read by the pacer without
-  // triggering renders on every one of the (possibly hundreds of) raw events.
   const networkRef = useRef<NetworkState>(IDLE_NETWORK);
   const revealedCountRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Display state: what's actually rendered. Updated by the pacer, not
-  // directly by network events (except `total`, which drives the skeleton
-  // count and should appear the instant it's known).
   const [total, setTotal] = useState(0);
   const [revealedCount, setRevealedCount] = useState(0);
   const [displayPhase, setDisplayPhase] = useState<NetworkPhase>("idle");
   const [summary, setSummary] = useState<Partial<GapReport["summary"]> | undefined>();
   const [reportId, setReportId] = useState<string>();
   const [error, setError] = useState<string>();
+  const [fileName, setFileName] = useState<string>();
+  const [dragActive, setDragActive] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -70,9 +67,6 @@ export default function UploadForm() {
         setSummary(net.summary);
         return;
       }
-      // Caught up with everything the network has sent so far. If the
-      // network call is finished too, we're done revealing; otherwise wait
-      // for more to arrive (leave the timer running).
       if (net.phase === "done" || net.phase === "error") {
         stopPacer();
         setDisplayPhase(net.phase);
@@ -83,8 +77,7 @@ export default function UploadForm() {
     }, REVEAL_INTERVAL_MS);
   }
 
-  async function submit(useSample: boolean) {
-    const file = fileInputRef.current?.files?.[0];
+  async function runAnalysis(file: File | null, useSample: boolean) {
     if (!useSample && !file) {
       setError("Choose a CSV file, or use the sample journey.");
       setDisplayPhase("error");
@@ -155,31 +148,87 @@ export default function UploadForm() {
     }
   }
 
+  function handleFileChosen(file: File | undefined) {
+    if (!file) return;
+    setFileName(file.name);
+    setError(undefined);
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragActive(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && fileInputRef.current) {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      fileInputRef.current.files = dt.files;
+      handleFileChosen(file);
+    }
+  }
+
   const running = displayPhase === "running";
+  const showTimeline = displayPhase === "running" || displayPhase === "done";
 
   return (
     <div className="panel">
-      <h2>Run analysis</h2>
-      <div className="form-row">
-        <input ref={fileInputRef} type="file" accept=".csv" disabled={running} />
-        <button className="primary" disabled={running} onClick={() => submit(false)}>
-          {running ? "Analyzing…" : "Analyze CSV"}
-        </button>
-        <button disabled={running} onClick={() => submit(true)}>
-          Use sample journey
-        </button>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <h2>Run analysis</h2>
+        {running && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, font: "500 13px var(--font-body)", color: "var(--accent)" }}>
+            <span className="pulse-dot" /> Analyzing…
+          </div>
+        )}
       </div>
+
+      {!running && (
+        <div
+          className={`dropzone${dragActive ? " dropzone-active" : ""}`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragActive(true);
+          }}
+          onDragLeave={() => setDragActive(false)}
+          onDrop={handleDrop}
+        >
+          <svg className="dropzone-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <path d="M12 16V4M12 4l-4 4M12 4l4 4" />
+            <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
+          </svg>
+          <div className="dropzone-title">{fileName ?? "Drop a CSV here, or choose a file"}</div>
+          <div className="dropzone-hint">step_name, owning_team, channel, description</div>
+          <label htmlFor="csv-input" className="btn" style={{ marginTop: 4 }}>
+            Choose file…
+          </label>
+          <input
+            id="csv-input"
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            className="visually-hidden"
+            disabled={running}
+            onChange={(e) => handleFileChosen(e.target.files?.[0])}
+          />
+        </div>
+      )}
+
+      {!running && (
+        <div className="form-row">
+          <button onClick={() => runAnalysis(null, true)}>Use sample journey</button>
+          <button className="primary" onClick={() => runAnalysis(fileInputRef.current?.files?.[0] ?? null, false)}>
+            Analyze CSV
+          </button>
+        </div>
+      )}
+
       {displayPhase === "error" && <div className="error">{error}</div>}
 
-      {(displayPhase === "running" || displayPhase === "done") && (
+      {showTimeline && (
         <div style={{ marginTop: 20 }}>
           <GapTimeline
             summary={summary}
             sequence={networkRef.current.sequence.slice(0, revealedCount)}
-            // Only show skeletons for steps still expected while running.
-            // If the model ends up returning fewer than `total` (a rare
-            // hallucination case), don't leave skeletons spinning forever.
             totalSteps={displayPhase === "running" ? total : revealedCount}
+            resolvedStyle
           />
           {displayPhase === "done" && reportId && (
             <p style={{ marginTop: 12 }}>
