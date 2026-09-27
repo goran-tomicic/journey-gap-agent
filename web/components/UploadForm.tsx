@@ -2,36 +2,104 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { GapReport, StepResult } from "../../src/types.js";
 import GapTimeline from "./GapTimeline";
 
-type Phase = "idle" | "running" | "done" | "error";
+type NetworkPhase = "idle" | "running" | "done" | "error";
 
-interface RunState {
-  phase: Phase;
-  total: number;
+// The model can finish generating its whole tool call in well under a
+// second once it starts (most of the real wait is "thinking" time before
+// any output begins) — too fast for a step-by-step reveal to be visible
+// on the wire. So "data has arrived" (network) is decoupled from "shown to
+// the user" (display): real results land in a ref as they stream in, and a
+// fixed-cadence pacer reveals them one card at a time, continuing to drain
+// even after the network call has already fully finished.
+const REVEAL_INTERVAL_MS = 350;
+
+interface NetworkState {
+  phase: NetworkPhase;
   sequence: StepResult[];
   summary?: Partial<GapReport["summary"]>;
   reportId?: string;
   error?: string;
 }
 
-const IDLE: RunState = { phase: "idle", total: 0, sequence: [] };
+const IDLE_NETWORK: NetworkState = { phase: "idle", sequence: [] };
 
 export default function UploadForm() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [state, setState] = useState<RunState>(IDLE);
+
+  // Source of truth for network progress; read by the pacer without
+  // triggering renders on every one of the (possibly hundreds of) raw events.
+  const networkRef = useRef<NetworkState>(IDLE_NETWORK);
+  const revealedCountRef = useRef(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Display state: what's actually rendered. Updated by the pacer, not
+  // directly by network events (except `total`, which drives the skeleton
+  // count and should appear the instant it's known).
+  const [total, setTotal] = useState(0);
+  const [revealedCount, setRevealedCount] = useState(0);
+  const [displayPhase, setDisplayPhase] = useState<NetworkPhase>("idle");
+  const [summary, setSummary] = useState<Partial<GapReport["summary"]> | undefined>();
+  const [reportId, setReportId] = useState<string>();
+  const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  function stopPacer() {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }
+
+  function startPacer() {
+    stopPacer();
+    timerRef.current = setInterval(() => {
+      const net = networkRef.current;
+      if (revealedCountRef.current < net.sequence.length) {
+        revealedCountRef.current += 1;
+        setRevealedCount(revealedCountRef.current);
+        setSummary(net.summary);
+        return;
+      }
+      // Caught up with everything the network has sent so far. If the
+      // network call is finished too, we're done revealing; otherwise wait
+      // for more to arrive (leave the timer running).
+      if (net.phase === "done" || net.phase === "error") {
+        stopPacer();
+        setDisplayPhase(net.phase);
+        setSummary(net.summary);
+        if (net.phase === "done") setReportId(net.reportId);
+        if (net.phase === "error") setError(net.error);
+      }
+    }, REVEAL_INTERVAL_MS);
+  }
 
   async function submit(useSample: boolean) {
     const file = fileInputRef.current?.files?.[0];
     if (!useSample && !file) {
-      setState({ ...IDLE, phase: "error", error: "Choose a CSV file, or use the sample journey." });
+      setError("Choose a CSV file, or use the sample journey.");
+      setDisplayPhase("error");
       return;
     }
 
-    setState({ ...IDLE, phase: "running" });
+    networkRef.current = { ...IDLE_NETWORK, phase: "running" };
+    revealedCountRef.current = 0;
+    setTotal(0);
+    setRevealedCount(0);
+    setSummary(undefined);
+    setReportId(undefined);
+    setError(undefined);
+    setDisplayPhase("running");
+    startPacer();
 
     try {
       const form = new FormData();
@@ -61,33 +129,33 @@ export default function UploadForm() {
           const event = JSON.parse(line);
 
           if (event.type === "start") {
-            setState((s) => ({ ...s, total: event.total }));
+            setTotal(event.total);
           } else if (event.type === "progress") {
-            setState((s) => ({ ...s, sequence: event.sequence, summary: event.summary }));
+            networkRef.current = { ...networkRef.current, sequence: event.sequence, summary: event.summary };
           } else if (event.type === "done") {
-            setState((s) => ({
-              ...s,
+            networkRef.current = {
+              ...networkRef.current,
               phase: "done",
               sequence: event.report.sequence,
               summary: event.report.summary,
               reportId: event.id,
-            }));
+            };
             router.refresh();
           } else if (event.type === "error") {
-            setState((s) => ({ ...s, phase: "error", error: event.error }));
+            networkRef.current = { ...networkRef.current, phase: "error", error: event.error };
           }
         }
       }
     } catch (err) {
-      setState((s) => ({
-        ...s,
+      networkRef.current = {
+        ...networkRef.current,
         phase: "error",
         error: err instanceof Error ? err.message : "Analysis failed.",
-      }));
+      };
     }
   }
 
-  const running = state.phase === "running";
+  const running = displayPhase === "running";
 
   return (
     <div className="panel">
@@ -101,14 +169,21 @@ export default function UploadForm() {
           Use sample journey
         </button>
       </div>
-      {state.phase === "error" && <div className="error">{state.error}</div>}
+      {displayPhase === "error" && <div className="error">{error}</div>}
 
-      {(state.phase === "running" || state.phase === "done") && (
+      {(displayPhase === "running" || displayPhase === "done") && (
         <div style={{ marginTop: 20 }}>
-          <GapTimeline summary={state.summary} sequence={state.sequence} totalSteps={state.total} />
-          {state.phase === "done" && state.reportId && (
+          <GapTimeline
+            summary={summary}
+            sequence={networkRef.current.sequence.slice(0, revealedCount)}
+            // Only show skeletons for steps still expected while running.
+            // If the model ends up returning fewer than `total` (a rare
+            // hallucination case), don't leave skeletons spinning forever.
+            totalSteps={displayPhase === "running" ? total : revealedCount}
+          />
+          {displayPhase === "done" && reportId && (
             <p style={{ marginTop: 12 }}>
-              Saved. <Link href={`/reports/${state.reportId}`}>View this report</Link>
+              Saved. <Link href={`/reports/${reportId}`}>View this report</Link>
             </p>
           )}
         </div>

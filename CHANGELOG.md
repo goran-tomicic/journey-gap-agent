@@ -19,6 +19,15 @@ Live progress in the web app instead of a blank wait while the model runs.
   fire just after the stream is awaited-complete, which was throwing
   "Controller is already closed" after the done event had already sent;
   added a closed-guard around the response stream.
+- Found during manual testing: once the model starts emitting the tool call,
+  it generates the whole thing in well under a second — nearly all real
+  latency is "thinking" time before output starts, not something spread
+  across the response. Raw network-level streaming was correct, but a
+  per-step reveal at that speed was imperceptible. Fixed by decoupling
+  "data has arrived" from "shown to the user": the UI now reveals completed
+  steps at a fixed ~350ms cadence, continuing to drain the queue even after
+  the network call has already finished, instead of dumping everything at
+  once.
 - Verified against the live API in both dev and production builds (`next
   build` + `next start`): homepage, streaming analyze (sample + upload),
   report page, unknown-report 404, and bad-input handling all pass.
