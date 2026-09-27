@@ -59,3 +59,18 @@ point each issue occurs.
 `data/journey.csv` is a synthetic 10-step B2B onboarding journey with a
 planted gap, a channel mismatch, and two ownership issues, so there's
 something concrete for the agent to catch.
+
+## Web app
+A small Next.js app under `web/` runs the same agent from the browser:
+upload a CSV (or use the sample journey), view the result as the visual
+timeline, and browse past reports.
+
+```
+cd web
+cp .env.example .env.local   # fill in your Anthropic API key
+npm install
+npm run dev
+```
+Then open http://localhost:3000. Reports persist as JSON files under
+`data/reports/` at the repo root (not committed). The web app reuses the
+same analysis logic as the CLI, from `src/lib/gapReport.ts`.
