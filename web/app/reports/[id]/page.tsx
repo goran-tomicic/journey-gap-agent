@@ -12,13 +12,14 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="page">
-      <p>
-        <Link href="/">&larr; Back</Link>
-      </p>
-      <h1>Journey Gap Report</h1>
-      <div className="subtitle">
-        {stored.sourceName} &middot; {new Date(stored.createdAt).toLocaleString()}
+      <Link href="/" className="back-link">
+        &larr; Back
+      </Link>
+      <div className="eyebrow" style={{ marginTop: 14 }}>
+        Journey gap report
       </div>
+      <h1>{stored.sourceName}</h1>
+      <div className="subtitle">{new Date(stored.createdAt).toLocaleString()}</div>
       <GapTimeline summary={stored.report.summary} sequence={stored.report.sequence} />
     </div>
   );

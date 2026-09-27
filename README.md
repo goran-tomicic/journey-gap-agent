@@ -79,3 +79,8 @@ Analysis streams live: step cards render as skeleton placeholders as soon as
 the CSV is parsed, then fill in with real content (and their gap/ownership/
 channel-mismatch flags) as Claude generates each one, instead of waiting on
 a single blocking response.
+
+Gaps and channel mismatches render as a visible break in the connecting
+line — a dashed callout leading to a card with the reasoning — rather than
+a note stacked under the step above. Ownership conflicts show as a badge
+next to the step name instead.

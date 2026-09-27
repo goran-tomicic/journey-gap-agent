@@ -2,6 +2,28 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/ui-polish
+Visual redesign of the web app, based on a design preview reviewed and
+approved before implementation.
+
+- Typography: Space Grotesk (headings) + IBM Plex Sans (body) via
+  `next/font/google`, replacing system-default fonts.
+- Palette: neutral grey scale (background, borders, skeleton shimmer)
+  instead of default white/gray, with distinct accent colors per issue type
+  (amber = gap, rose = ownership conflict, violet = channel mismatch).
+- Timeline redesign: gaps and channel mismatches now render as a visible
+  break in the connecting line — a dashed colored segment leading to a
+  callout card with the full reasoning — instead of a note stacked under
+  the step above. Ownership conflicts show as a badge next to the step
+  name, with the reasoning as a compact inline line, instead of a boxed
+  note.
+- Upload panel restyled as a dropzone with drag-and-drop support (in
+  addition to the existing file picker), plus a live "Analyzing…" pulse
+  indicator.
+- History list and summary counts restyled as pill badges.
+- Verified against the live API: full analysis run, report page rendering,
+  history list, 404 and bad-input handling, and a clean production build.
+
 ## feature/streaming-progress
 Live progress in the web app instead of a blank wait while the model runs.
 
