@@ -73,21 +73,49 @@ function StepCard({ step, index }: { step: StepResult; index: number }) {
   );
 }
 
-export default function GapTimeline({ report }: { report: GapReport }) {
-  const { summary, sequence } = report;
+function SkeletonCard({ index }: { index: number }) {
+  return (
+    <div className="step-card step-card-skeleton" aria-hidden="true">
+      <div className="step-index skeleton-block" />
+      <div className="step-body">
+        <div className="skeleton-line skeleton-line-name" style={{ animationDelay: `${index * 60}ms` }} />
+        <div className="skeleton-line skeleton-line-meta" style={{ animationDelay: `${index * 60 + 60}ms` }} />
+      </div>
+    </div>
+  );
+}
+
+interface GapTimelineProps {
+  summary?: Partial<GapReport["summary"]>;
+  sequence: StepResult[];
+  /** Total steps expected. If greater than sequence.length, the remainder
+   * render as skeleton placeholders (used while a report is still streaming
+   * in). Defaults to sequence.length (no skeletons). */
+  totalSteps?: number;
+}
+
+export default function GapTimeline({ summary, sequence, totalSteps }: GapTimelineProps) {
+  const expected = totalSteps ?? sequence.length;
+  const skeletonCount = Math.max(0, expected - sequence.length);
 
   return (
     <>
       <div className="summary">
-        {summary.steps} steps &middot; {summary.gaps} gaps found &middot;{" "}
-        {summary.ownership_conflicts} ownership conflicts &middot;{" "}
-        {summary.channel_mismatches} channel mismatches
+        {summary?.steps ?? expected} steps &middot; {summary?.gaps ?? "…"} gaps found &middot;{" "}
+        {summary?.ownership_conflicts ?? "…"} ownership conflicts &middot;{" "}
+        {summary?.channel_mismatches ?? "…"} channel mismatches
       </div>
       <div className="timeline">
         {sequence.map((step, i) => (
           <div key={i}>
             {i > 0 && <Connector issues={beforeIssues(step)} />}
             <StepCard step={step} index={i} />
+          </div>
+        ))}
+        {Array.from({ length: skeletonCount }).map((_, i) => (
+          <div key={`skeleton-${i}`}>
+            {(sequence.length > 0 || i > 0) && <div className="connector" />}
+            <SkeletonCard index={i} />
           </div>
         ))}
       </div>

@@ -74,3 +74,8 @@ npm run dev
 Then open http://localhost:3000. Reports persist as JSON files under
 `data/reports/` at the repo root (not committed). The web app reuses the
 same analysis logic as the CLI, from `src/lib/gapReport.ts`.
+
+Analysis streams live: step cards render as skeleton placeholders as soon as
+the CSV is parsed, then fill in with real content (and their gap/ownership/
+channel-mismatch flags) as Claude generates each one, instead of waiting on
+a single blocking response.
