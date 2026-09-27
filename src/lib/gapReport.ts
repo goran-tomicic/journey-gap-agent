@@ -1,6 +1,6 @@
 import { parse } from "csv-parse/sync";
 import Anthropic from "@anthropic-ai/sdk";
-import type { GapReport, Touchpoint } from "../types.js";
+import type { GapReport, StepResult, Touchpoint } from "../types.js";
 
 export const SYSTEM_PROMPT = `You are a journey-gap analysis agent. You are given a list \
 of touchpoints/steps in a customer journey that spans multiple teams. Each \
@@ -135,5 +135,66 @@ export async function generateGapReport(
       `Warning: model returned ${gapReport.sequence.length} steps, input had ${touchpoints.length}.`
     );
   }
+  return gapReport;
+}
+
+/** A best-effort, partially-parsed snapshot of the tool input while it's
+ * still streaming in. Fields may be missing or, for the in-progress array
+ * element, incomplete. */
+interface PartialGapReport {
+  summary?: Partial<GapReport["summary"]>;
+  sequence?: unknown[];
+}
+
+/** Same as generateGapReport, but calls onProgress with the safely-complete
+ * prefix of "sequence" as the model streams its tool call. The last element
+ * of a streaming array may still be mid-write, so it's always excluded from
+ * the safe prefix; everything before it is guaranteed finished, since the
+ * model can't return to an earlier array element once it's moved on. */
+export async function streamGapReport(
+  touchpoints: Touchpoint[],
+  options: GenerateOptions,
+  onProgress: (safeSequence: StepResult[], summary: PartialGapReport["summary"]) => void
+): Promise<GapReport> {
+  const client = new Anthropic({ apiKey: options.apiKey });
+
+  const stream = client.messages.stream({
+    model: options.model,
+    max_tokens: 4096,
+    system: SYSTEM_PROMPT,
+    tools: [GAP_REPORT_TOOL],
+    tool_choice: { type: "tool", name: "submit_gap_report" },
+    messages: [
+      {
+        role: "user",
+        content:
+          "Here is the touchpoint list (unordered), one per line:\n\n" +
+          formatTouchpoints(touchpoints),
+      },
+    ],
+  });
+
+  stream.on("inputJson", (_partialJson, snapshot) => {
+    const partial = snapshot as PartialGapReport;
+    const sequence = Array.isArray(partial.sequence) ? partial.sequence : [];
+    const safeSequence = sequence.slice(0, -1) as StepResult[];
+    onProgress(safeSequence, partial.summary);
+  });
+
+  const message = await stream.finalMessage();
+  const toolUse = message.content.find(
+    (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
+  );
+  if (!toolUse) {
+    throw new Error("Model did not call submit_gap_report");
+  }
+
+  const gapReport = toolUse.input as GapReport;
+  if (gapReport.sequence.length !== touchpoints.length) {
+    console.error(
+      `Warning: model returned ${gapReport.sequence.length} steps, input had ${touchpoints.length}.`
+    );
+  }
+  onProgress(gapReport.sequence, gapReport.summary);
   return gapReport;
 }

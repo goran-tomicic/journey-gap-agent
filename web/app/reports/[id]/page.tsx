@@ -19,7 +19,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
       <div className="subtitle">
         {stored.sourceName} &middot; {new Date(stored.createdAt).toLocaleString()}
       </div>
-      <GapTimeline report={stored.report} />
+      <GapTimeline summary={stored.report.summary} sequence={stored.report.sequence} />
     </div>
   );
 }
