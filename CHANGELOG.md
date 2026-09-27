@@ -2,6 +2,24 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/web-app
+Browser frontend (Next.js) as an alternative to the CLI, backed by the same
+analysis logic.
+
+- Extracted the Claude call and CSV parsing out of `src/agent.ts` into
+  `src/lib/gapReport.ts`, shared by both the CLI and the new web app.
+- `web/` — Next.js app: upload a CSV or run the sample journey, view the
+  result as the visual timeline (same design as the HTML report, as a React
+  component), and browse a history of past runs.
+- Reports persist as JSON files under `data/reports/` (gitignored, local
+  only) via `web/lib/reportStore.ts`.
+- Fixed two bugs found while testing: the analyze endpoint threw an
+  unhandled 500 on a non-multipart request instead of returning 400, and the
+  report page hadn't been updated for Next.js 15's async `params`.
+- Verified end-to-end against the live API: sample-journey run, file-upload
+  run, history list, bad-input handling, unknown-report 404, and a clean
+  production build (`next build`).
+
 ## feature/html-report
 Visual HTML report output alongside the existing markdown report.
 

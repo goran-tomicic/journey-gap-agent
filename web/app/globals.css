@@ -1,0 +1,242 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #6b7280;
+  --card-bg: #f8fafc;
+  --card-border: #e2e8f0;
+  --line: #cbd5e1;
+  --issue: #dc2626;
+  --issue-bg: #fef2f2;
+  --issue-border: #fecaca;
+  --accent: #2563eb;
+  --accent-fg: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --fg: #e5e7eb;
+    --muted: #9ca3af;
+    --card-bg: #1a1d24;
+    --card-border: #2a2e37;
+    --line: #3f4551;
+    --issue: #f87171;
+    --issue-bg: #2a1616;
+    --issue-border: #5b2323;
+    --accent: #3b82f6;
+    --accent-fg: #0f1115;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 32px 16px 64px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: var(--accent);
+}
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 28px;
+}
+
+.panel {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 28px;
+}
+
+.panel h2 {
+  margin-top: 0;
+  font-size: 1.05rem;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--bg);
+  color: var(--fg);
+  padding: 8px 14px;
+}
+
+button.primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+input[type="file"] {
+  font: inherit;
+  color: var(--fg);
+}
+
+.error {
+  color: var(--issue);
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.history-item .meta {
+  color: var(--muted);
+}
+
+.summary {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 32px;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.connector {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-left: 22px;
+}
+
+.connector-line {
+  flex-shrink: 0;
+}
+
+.issue-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.step-card {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+}
+
+.step-card-flagged {
+  border-color: var(--issue-border);
+}
+
+.step-index {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--line);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.step-card-flagged .step-index {
+  background: var(--issue);
+}
+
+.step-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.step-name {
+  font-weight: 600;
+  font-size: 1.02rem;
+}
+
+.step-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.issue-note {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: var(--issue-bg);
+  border: 1px solid var(--issue-border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.issue-label {
+  display: block;
+  font-weight: 700;
+  color: var(--issue);
+  margin-bottom: 2px;
+}
+
+.issue-text {
+  display: block;
+}
+
+.issue-confidence {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-top: 2px;
+}
