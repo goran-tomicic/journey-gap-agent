@@ -2,6 +2,25 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/journey-form
+Guided form to enter a journey in the browser, as an alternative to uploading a CSV.
+
+- Home page toggle: Build manually / Upload CSV.
+- Three-stage stepper: journey name, steps, review. Steps have a name,
+  channel (with suggestions), optional description, and any number of
+  owning teams (chip input; none = unowned, several = shared ownership,
+  sent to the agent as "A / B" like the CSV convention). Steps can be
+  edited, duplicated, deleted and reordered.
+- The draft is saved in the browser and restored on return; "New" clears
+  it and starts from scratch (with confirmation).
+- Review stage can download the journey as a CSV, and runs the analysis
+  with the same live Timeline / Swimlanes results.
+- `POST /api/analyze` accepts a `touchpoints` JSON field (plus
+  `journeyName`) and validates it server-side (non-empty, name + channel
+  per step, max 50 steps).
+- The streaming/paced-reveal logic moved out of `UploadForm` into a shared
+  `useAnalysisRun` hook used by both forms.
+
 ## feature/swimlane-redesign
 Swimlane view added as an alternative to the step-card timeline.
 
