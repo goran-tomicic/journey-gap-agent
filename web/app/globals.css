@@ -544,3 +544,183 @@ button:disabled {
     opacity: 1;
   }
 }
+
+/* ---- swimlane view ---- */
+.swimlane-view {
+  --frame: #eeeeee;
+  --flag: #fae35a;
+  --flag-ring: #f2d21f;
+  --mono: var(--font-mono), ui-monospace, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  .swimlane-view {
+    --frame: #1a1a1d;
+  }
+}
+
+.view-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.view-toggle button {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 7px 14px;
+  font: 500 13px var(--font-body);
+}
+
+.view-toggle button[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.swimlane-view .report-frame {
+  background: var(--frame);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.swimlane-view .card {
+  background: var(--surface);
+  margin: 0;
+}
+
+.swimlane-view .lanes {
+  display: grid;
+  align-items: center;
+  row-gap: 14px;
+  padding: 28px 24px;
+  overflow-x: auto;
+}
+
+.swimlane-view .lane-label {
+  font: 500 13px var(--mono);
+  color: var(--muted);
+  padding-right: 28px;
+}
+
+.swimlane-view .lane-cell {
+  display: flex;
+  justify-content: center;
+  min-width: 36px;
+}
+
+.swimlane-view .dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #0a0a0a;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 13px var(--mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  .swimlane-view .dot {
+    background: #f3f3f3;
+    color: #111111;
+  }
+}
+
+.swimlane-view .dot-conflict {
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--flag-ring);
+}
+
+.swimlane-view .dot-missing,
+.swimlane-view .dot-pending {
+  background: transparent;
+  border: 1.5px dashed var(--muted);
+}
+
+.swimlane-view .dot-pending {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.swimlane-view .flag-list,
+.swimlane-view .step-list {
+  list-style: none;
+  padding: 0;
+}
+
+.swimlane-view .flag {
+  padding: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.swimlane-view .flag:first-child {
+  border-top: none;
+}
+
+.swimlane-view .flag-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.swimlane-view .flag-tag {
+  background: var(--flag);
+  color: #0a0a0a;
+  font: 600 15px var(--mono);
+  padding: 5px 16px;
+  border-radius: 999px;
+}
+
+.swimlane-view .flag-where {
+  font: 500 15px var(--mono);
+}
+
+.swimlane-view .flag-text {
+  margin: 12px 0 8px;
+  font-size: 1.1rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.swimlane-view .flag-confidence {
+  font: 500 13px var(--mono);
+  color: var(--muted);
+}
+
+.swimlane-view .flag-reason {
+  font-family: var(--font-body);
+}
+
+.swimlane-view .step-list li {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+}
+
+.swimlane-view .step-list li:first-child {
+  border-top: none;
+}
+
+.swimlane-view .step-num {
+  font: 600 13px var(--mono);
+  width: 20px;
+}
+
+.swimlane-view .step-name {
+  font: 500 15px var(--font-body);
+}
+
+.swimlane-view .step-meta {
+  font: 400 13px var(--mono);
+  color: var(--muted);
+}
+

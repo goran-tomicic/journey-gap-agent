@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { GapReport, StepResult } from "../../src/types.js";
-import GapTimeline from "./GapTimeline";
+import ReportView from "./ReportView";
 
 type NetworkPhase = "idle" | "running" | "done" | "error";
 
@@ -224,7 +224,7 @@ export default function UploadForm() {
 
       {showTimeline && (
         <div style={{ marginTop: 20 }}>
-          <GapTimeline
+          <ReportView
             summary={summary}
             sequence={networkRef.current.sequence.slice(0, revealedCount)}
             totalSteps={displayPhase === "running" ? total : revealedCount}
