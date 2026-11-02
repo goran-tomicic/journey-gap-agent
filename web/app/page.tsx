@@ -1,5 +1,5 @@
 import Link from "next/link";
-import UploadForm from "../components/UploadForm";
+import JourneyInput from "../components/JourneyInput";
 import { listReports } from "../lib/reportStore.js";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ export default function HomePage() {
         mismatches.
       </div>
 
-      <UploadForm />
+      <JourneyInput />
 
       <div className="panel">
         <h2>History</h2>
