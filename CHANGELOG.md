@@ -2,6 +2,23 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/swimlane-redesign
+Web app restyled around a swimlane view of the journey.
+
+- Report view: one lane per owning team with numbered step dots in
+  sequence order, a dashed circle where a step is missing, and a highlighted
+  ring on steps with an ownership conflict (shown in both lanes when two
+  teams claim it).
+- Flags listed below the lanes as tagged rows (missing step, two owners,
+  no owner, no bridge) with location ("between 2 and 3"), a one-line
+  reason, and a confidence line.
+- Step list kept underneath so dots can be matched to step names.
+- Live analysis view streams steps in as dots, with pulsing placeholders
+  for steps still to come.
+- Visual system: IBM Plex Mono for labels, monochrome palette with a
+  single yellow accent for flags, square panels; replaces the per-issue
+  amber/rose/violet colors.
+
 ## feature/ui-polish
 Visual redesign of the web app, based on a design preview reviewed and
 approved before implementation.

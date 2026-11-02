@@ -1,93 +1,119 @@
 import type { GapReport, Issue, StepResult } from "../../src/types.js";
 
-const ISSUE_LABEL: Record<Issue["type"], string> = {
-  gap: "GAP",
-  ownership_conflict: "OWNERSHIP CONFLICT",
-  channel_mismatch: "CHANNEL MISMATCH",
-};
-
-function beforeIssues(step: StepResult): Issue[] {
-  return step.issues.filter((i) => i.position === "before");
+interface Flag {
+  tag: string;
+  where: string;
+  issue: Issue;
+  order: number;
 }
 
-function onIssues(step: StepResult): Issue[] {
-  return step.issues.filter((i) => i.position === "on");
+/** A step owned by two teams ("Onboarding / Support") sits in both lanes. */
+function owners(step: StepResult): string[] {
+  return step.team
+    .split(/[/,&]/)
+    .map((t) => t.trim().toLowerCase())
+    .filter((t) => t && t !== "(none)");
 }
 
-function confidenceLabel(text: string): string {
-  const head = text.split(/[—-]/)[0]?.trim();
-  return head && head.length <= 24 ? head.toUpperCase() : "FLAGGED";
+function splitConfidence(text: string): { level: string; reason: string } {
+  const [head, ...rest] = text.split(/\s[—-]\s|[—]/);
+  const level = (head?.trim() ?? "").replace(/\s+confidence$/i, "");
+  if (level && level.length <= 20) return { level: level.toLowerCase(), reason: rest.join(" — ").trim() };
+  return { level: "", reason: text };
 }
 
-function CalloutCard({ issue }: { issue: Issue }) {
-  const kind = issue.type === "gap" ? "gap" : "mismatch";
+function buildFlags(sequence: StepResult[]): Flag[] {
+  const flags: Flag[] = [];
+  sequence.forEach((step, i) => {
+    step.issues.forEach((issue) => {
+      let tag: string;
+      let where: string;
+      if (issue.type === "gap") {
+        tag = "missing step";
+        where = `between ${i} and ${i + 1}`;
+      } else if (issue.type === "channel_mismatch") {
+        tag = "no bridge";
+        where = `${i} to ${i + 1}`;
+      } else {
+        tag = owners(step).length === 0 ? "no owner" : "two owners";
+        where = `step ${i + 1}`;
+      }
+      flags.push({ tag, where, issue, order: i });
+    });
+  });
+  return flags;
+}
+
+interface Column {
+  /** 1-based step number, or null for a missing-step placeholder. */
+  step: number | null;
+  lanes: string[];
+  conflict: boolean;
+}
+
+function buildColumns(sequence: StepResult[], pending: number): Column[] {
+  const cols: Column[] = [];
+  sequence.forEach((step, i) => {
+    const hasGap = i > 0 && step.issues.some((x) => x.type === "gap" && x.position === "before");
+    if (hasGap) cols.push({ step: null, lanes: [], conflict: false });
+    const lanes = owners(step);
+    cols.push({
+      step: i + 1,
+      lanes: lanes.length ? lanes : ["unowned"],
+      conflict: step.issues.some((x) => x.type === "ownership_conflict"),
+    });
+  });
+  for (let i = 0; i < pending; i++) cols.push({ step: -1, lanes: [], conflict: false });
+  return cols;
+}
+
+function Swimlanes({ sequence, pending }: { sequence: StepResult[]; pending: number }) {
+  const columns = buildColumns(sequence, pending);
+  const laneNames: string[] = [];
+  columns.forEach((c) => c.lanes.forEach((l) => !laneNames.includes(l) && laneNames.push(l)));
+  // Placeholders (missing steps, not-yet-streamed steps) need a row to sit in.
+  const rows = laneNames.length ? laneNames : ["…"];
+
   return (
-    <div className={`callout-card callout-${kind}`}>
-      <div className="callout-header">
-        <span className="callout-label">
-          {ISSUE_LABEL[issue.type]} &middot; {confidenceLabel(issue.confidence)}
-        </span>
-      </div>
-      <div className="callout-text">{issue.description}</div>
-      <span className="callout-confidence">{issue.confidence}</span>
-    </div>
-  );
-}
-
-function Connector({ issues }: { issues: Issue[] }) {
-  if (issues.length === 0) {
-    return <div className="connector-clean" />;
-  }
-  const kind = issues[0].type === "gap" ? "var(--gap)" : "var(--mismatch)";
-  return (
-    <div className="connector">
-      <div className="connector-stem" style={{ backgroundImage: `linear-gradient(${kind} 60%, transparent 0%)` }} />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
-        {issues.map((issue, i) => (
-          <CalloutCard key={i} issue={issue} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function StepCard({ step, index, resolved }: { step: StepResult; index: number; resolved?: boolean }) {
-  const flagged = onIssues(step);
-  const team = step.team.trim() || "(none)";
-
-  return (
-    <div className={`step-card${resolved ? " step-card-resolved" : ""}`}>
-      <div className="step-index">{index + 1}</div>
-      <div className="step-body">
-        <div className="step-name-row">
-          <span className="step-name">{step.step_name}</span>
-          {flagged.length > 0 && <span className="badge badge-conflict">Ownership conflict</span>}
+    <div className="lanes" style={{ gridTemplateColumns: `max-content repeat(${columns.length}, 1fr)` }}>
+      {rows.map((lane, r) => (
+        <div className="lane-row" key={lane} style={{ display: "contents" }}>
+          <div className="lane-label">{lane}</div>
+          {columns.map((col, c) => {
+            let node: React.ReactNode = null;
+            if (col.step === null && r === 0) {
+              node = <span className="dot dot-missing" title="missing step" />;
+            } else if (col.step === -1 && r === 0) {
+              node = <span className="dot dot-pending" />;
+            } else if (col.step !== null && col.step > 0 && col.lanes.includes(lane)) {
+              node = <span className={`dot${col.conflict ? " dot-conflict" : ""}`}>{col.step}</span>;
+            }
+            return (
+              <div className="lane-cell" key={c}>
+                {node}
+              </div>
+            );
+          })}
         </div>
-        <div className="step-meta">
-          {team} &middot; {step.channel}
-        </div>
-        {flagged.map((issue, i) => (
-          <div className="issue-inline" key={i}>
-            <span className="issue-dot issue-dot-conflict" />
-            <span>
-              {issue.description} <span style={{ color: "var(--muted)" }}>({issue.confidence})</span>
-            </span>
-          </div>
-        ))}
-      </div>
+      ))}
     </div>
   );
 }
 
-function SkeletonCard({ index }: { index: number }) {
+function FlagRow({ flag }: { flag: Flag }) {
+  const { level, reason } = splitConfidence(flag.issue.confidence);
   return (
-    <div className="step-card skeleton-card" aria-hidden="true">
-      <div className="step-index skeleton-block" />
-      <div className="step-body">
-        <div className="skeleton-line skeleton-line-name" style={{ animationDelay: `${index * 60}ms` }} />
-        <div className="skeleton-line skeleton-line-meta" style={{ animationDelay: `${index * 60 + 60}ms` }} />
+    <li className="flag">
+      <div className="flag-head">
+        <span className="flag-tag">{flag.tag}</span>
+        <span className="flag-where">{flag.where}</span>
       </div>
-    </div>
+      <p className="flag-text">{flag.issue.description}</p>
+      <div className="flag-confidence">
+        {level ? `confidence: ${level}` : "confidence"}
+        {reason && <span className="flag-reason"> · {reason}</span>}
+      </div>
+    </li>
   );
 }
 
@@ -95,40 +121,55 @@ interface GapTimelineProps {
   summary?: Partial<GapReport["summary"]>;
   sequence: StepResult[];
   /** Total steps expected. If greater than sequence.length, the remainder
-   * render as skeleton placeholders (used while a report is still streaming
-   * in). Defaults to sequence.length (no skeletons). */
+   * render as placeholder dots (used while a report is still streaming in).
+   * Defaults to sequence.length (no placeholders). */
   totalSteps?: number;
-  /** Steps rendered with the "just resolved" card style instead of the
-   * finished report's plain card style (used on the live analysis view). */
+  /** Kept for the live analysis view; the swimlane layout has no separate
+   * "resolved" card style. */
   resolvedStyle?: boolean;
 }
 
-export default function GapTimeline({ summary, sequence, totalSteps, resolvedStyle }: GapTimelineProps) {
+export default function GapTimeline({ summary, sequence, totalSteps }: GapTimelineProps) {
   const expected = totalSteps ?? sequence.length;
-  const skeletonCount = Math.max(0, expected - sequence.length);
+  const pending = Math.max(0, expected - sequence.length);
+  const flags = buildFlags(sequence);
 
   return (
-    <>
+    <div className="report">
       <div className="summary">
         <span className="pill">{summary?.steps ?? expected} steps</span>
-        <span className="pill pill-gap">{summary?.gaps ?? "…"} gaps</span>
-        <span className="pill pill-conflict">{summary?.ownership_conflicts ?? "…"} ownership conflicts</span>
-        <span className="pill pill-mismatch">{summary?.channel_mismatches ?? "…"} channel mismatches</span>
+        <span className="pill pill-flag">{summary?.gaps ?? "…"} missing</span>
+        <span className="pill pill-flag">{summary?.ownership_conflicts ?? "…"} ownership</span>
+        <span className="pill pill-flag">{summary?.channel_mismatches ?? "…"} no bridge</span>
       </div>
-      <div className="timeline">
-        {sequence.map((step, i) => (
-          <div key={i}>
-            {i > 0 && <Connector issues={beforeIssues(step)} />}
-            <StepCard step={step} index={i} resolved={resolvedStyle} />
-          </div>
-        ))}
-        {Array.from({ length: skeletonCount }).map((_, i) => (
-          <div key={`skeleton-${i}`}>
-            {(sequence.length > 0 || i > 0) && <div className="connector-clean" />}
-            <SkeletonCard index={i} />
-          </div>
-        ))}
+
+      <div className="report-frame">
+        <div className="card">
+          <Swimlanes sequence={sequence} pending={pending} />
+        </div>
+
+        {flags.length > 0 && (
+          <ul className="card flag-list">
+            {flags.map((f, i) => (
+              <FlagRow key={i} flag={f} />
+            ))}
+          </ul>
+        )}
+
+        {sequence.length > 0 && (
+          <ol className="card step-list">
+            {sequence.map((s, i) => (
+              <li key={i}>
+                <span className="step-num">{i + 1}</span>
+                <span className="step-name">{s.step_name}</span>
+                <span className="step-meta">
+                  {s.team.trim() || "(none)"} · {s.channel}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
       </div>
-    </>
+    </div>
   );
 }
