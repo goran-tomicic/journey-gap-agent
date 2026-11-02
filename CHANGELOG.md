@@ -2,6 +2,21 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/swimlane-redesign
+Swimlane view added as an alternative to the step-card timeline.
+
+- Timeline / Swimlanes toggle on the live analysis view and on saved
+  reports; the choice is remembered in the browser. Timeline stays the
+  default and is unchanged.
+- Swimlane view: one lane per owning team with numbered step dots in
+  sequence order, a dashed circle where a step is missing, and a ring on
+  steps with an ownership conflict (shown in both lanes when two teams
+  claim it). Flags are listed below as tagged rows (missing step, two
+  owners, no owner, no bridge) with location, one-line reason and
+  confidence, followed by a step list. Styled to match the timeline view
+  (same fonts, grey step circles, rounded cards, per-issue colors).
+- Live analysis streams steps into the lanes with pulsing placeholders.
+
 ## feature/ui-polish
 Visual redesign of the web app, based on a design preview reviewed and
 approved before implementation.
