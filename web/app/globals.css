@@ -546,19 +546,6 @@ button:disabled {
 }
 
 /* ---- swimlane view ---- */
-.swimlane-view {
-  --frame: #eeeeee;
-  --flag: #fae35a;
-  --flag-ring: #f2d21f;
-  --mono: var(--font-mono), ui-monospace, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  .swimlane-view {
-    --frame: #1a1a1d;
-  }
-}
-
 .view-toggle {
   display: inline-flex;
   border: 1px solid var(--border);
@@ -582,8 +569,6 @@ button:disabled {
 }
 
 .swimlane-view .report-frame {
-  background: var(--frame);
-  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -591,6 +576,8 @@ button:disabled {
 
 .swimlane-view .card {
   background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   margin: 0;
 }
 
@@ -598,14 +585,14 @@ button:disabled {
   display: grid;
   align-items: center;
   row-gap: 14px;
-  padding: 28px 24px;
+  padding: 20px 16px;
   overflow-x: auto;
 }
 
 .swimlane-view .lane-label {
-  font: 500 13px var(--mono);
+  font: 500 13px var(--font-body);
   color: var(--muted);
-  padding-right: 28px;
+  padding-right: 24px;
 }
 
 .swimlane-view .lane-cell {
@@ -615,35 +602,31 @@ button:disabled {
 }
 
 .swimlane-view .dot {
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: #0a0a0a;
-  color: #ffffff;
+  background: var(--border);
+  color: var(--text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font: 600 13px var(--mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  .swimlane-view .dot {
-    background: #f3f3f3;
-    color: #111111;
-  }
+  font: 600 13px var(--font-body);
 }
 
 .swimlane-view .dot-conflict {
-  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--flag-ring);
+  background: var(--conflict-bg);
+  color: var(--conflict);
+  box-shadow: 0 0 0 2px var(--conflict);
 }
 
 .swimlane-view .dot-missing,
 .swimlane-view .dot-pending {
   background: transparent;
-  border: 1.5px dashed var(--muted);
+  border: 1.5px dashed var(--gap);
 }
 
 .swimlane-view .dot-pending {
+  border-color: var(--border);
   animation: pulse 1s ease-in-out infinite;
 }
 
@@ -651,10 +634,11 @@ button:disabled {
 .swimlane-view .step-list {
   list-style: none;
   padding: 0;
+  overflow: hidden;
 }
 
 .swimlane-view .flag {
-  padding: 24px;
+  padding: 14px 16px;
   border-top: 1px solid var(--border);
 }
 
@@ -666,35 +650,45 @@ button:disabled {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 
 .swimlane-view .flag-tag {
-  background: var(--flag);
-  color: #0a0a0a;
-  font: 600 15px var(--mono);
-  padding: 5px 16px;
+  font: 600 11.5px var(--font-body);
+  padding: 2px 10px;
   border-radius: 999px;
 }
 
+.swimlane-view .flag-gap .flag-tag {
+  background: var(--gap-bg);
+  color: var(--gap);
+}
+
+.swimlane-view .flag-conflict .flag-tag {
+  background: var(--conflict-bg);
+  color: var(--conflict);
+}
+
+.swimlane-view .flag-mismatch .flag-tag {
+  background: var(--mismatch-bg);
+  color: var(--mismatch);
+}
+
 .swimlane-view .flag-where {
-  font: 500 15px var(--mono);
+  font: 500 13px var(--font-body);
+  color: var(--muted);
 }
 
 .swimlane-view .flag-text {
-  margin: 12px 0 8px;
-  font-size: 1.1rem;
+  margin: 8px 0 4px;
+  font: 400 13.5px var(--font-body);
   line-height: 1.45;
-  color: var(--muted);
+  color: var(--text);
 }
 
 .swimlane-view .flag-confidence {
-  font: 500 13px var(--mono);
+  font: 400 12px var(--font-body);
   color: var(--muted);
-}
-
-.swimlane-view .flag-reason {
-  font-family: var(--font-body);
 }
 
 .swimlane-view .step-list li {
@@ -702,7 +696,7 @@ button:disabled {
   align-items: baseline;
   flex-wrap: wrap;
   gap: 4px 12px;
-  padding: 12px 24px;
+  padding: 12px 16px;
   border-top: 1px solid var(--border);
 }
 
@@ -711,16 +705,16 @@ button:disabled {
 }
 
 .swimlane-view .step-num {
-  font: 600 13px var(--mono);
+  font: 600 13px var(--font-body);
   width: 20px;
-}
-
-.swimlane-view .step-name {
-  font: 500 15px var(--font-body);
-}
-
-.swimlane-view .step-meta {
-  font: 400 13px var(--mono);
   color: var(--muted);
 }
 
+.swimlane-view .step-name {
+  font: 600 15px var(--font-display);
+}
+
+.swimlane-view .step-meta {
+  font: 400 13px var(--font-body);
+  color: var(--muted);
+}

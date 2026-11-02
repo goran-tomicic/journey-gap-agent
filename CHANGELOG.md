@@ -13,7 +13,8 @@ Swimlane view added as an alternative to the step-card timeline.
   steps with an ownership conflict (shown in both lanes when two teams
   claim it). Flags are listed below as tagged rows (missing step, two
   owners, no owner, no bridge) with location, one-line reason and
-  confidence, followed by a step list. Styles are scoped to the view.
+  confidence, followed by a step list. Styled to match the timeline view
+  (same fonts, grey step circles, rounded cards, per-issue colors).
 - Live analysis streams steps into the lanes with pulsing placeholders.
 
 ## feature/ui-polish

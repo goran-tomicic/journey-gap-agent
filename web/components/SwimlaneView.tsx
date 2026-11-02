@@ -1,6 +1,7 @@
 import type { GapReport, Issue, StepResult } from "../../src/types.js";
 
 interface Flag {
+  kind: "gap" | "conflict" | "mismatch";
   tag: string;
   where: string;
   issue: Issue;
@@ -27,18 +28,22 @@ function buildFlags(sequence: StepResult[]): Flag[] {
   sequence.forEach((step, i) => {
     step.issues.forEach((issue) => {
       let tag: string;
+      let kind: Flag["kind"];
       let where: string;
       if (issue.type === "gap") {
         tag = "missing step";
+        kind = "gap";
         where = `between ${i} and ${i + 1}`;
       } else if (issue.type === "channel_mismatch") {
         tag = "no bridge";
+        kind = "mismatch";
         where = `${i} to ${i + 1}`;
       } else {
         tag = owners(step).length === 0 ? "no owner" : "two owners";
+        kind = "conflict";
         where = `step ${i + 1}`;
       }
-      flags.push({ tag, where, issue, order: i });
+      flags.push({ kind, tag, where, issue, order: i });
     });
   });
   return flags;
@@ -103,7 +108,7 @@ function Swimlanes({ sequence, pending }: { sequence: StepResult[]; pending: num
 function FlagRow({ flag }: { flag: Flag }) {
   const { level, reason } = splitConfidence(flag.issue.confidence);
   return (
-    <li className="flag">
+    <li className={`flag flag-${flag.kind}`}>
       <div className="flag-head">
         <span className="flag-tag">{flag.tag}</span>
         <span className="flag-where">{flag.where}</span>
