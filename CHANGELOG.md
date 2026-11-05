@@ -34,6 +34,8 @@ Journey map view replaces the Swimlanes view; health summary on both views.
   handoffs, channel segments and labels fade in (the channel bar grows
   smoothly as steps are added), and minimap segments grow in. All
   entrance motion is skipped for users who prefer reduced motion.
+- When the map is wider than the page, selecting a step or flagged handoff
+  (from the map, minimap or flag list) smoothly scrolls it into view.
 - A saved "swimlane" view preference maps to Map.
 
 ## feature/next-steps

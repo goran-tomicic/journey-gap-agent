@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { GapReport, StepResult } from "../../src/types.js";
 import { buildFlags, owners, sameLocation } from "../lib/journey";
 import type { Flag, FlagKind, FlagLocation } from "../lib/journey";
@@ -49,6 +49,7 @@ interface MapViewProps {
 export default function MapView({ sequence, totalSteps }: MapViewProps) {
   const [selected, setSelected] = useState<FlagLocation | null>(null);
   const [hidden, setHidden] = useState<Set<FlagKind>>(new Set());
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const pending = Math.max(0, (totalSteps ?? sequence.length) - sequence.length);
   const n = sequence.length + pending;
@@ -77,6 +78,19 @@ export default function MapView({ sequence, totalSteps }: MapViewProps) {
 
   const flagsAt = (loc: FlagLocation) => flags.filter((f) => sameLocation(f.location, loc));
   const dim = (loc: FlagLocation) => (selected && !sameLocation(selected, loc) ? 0.45 : 1);
+
+  // Bring a newly selected step or handoff into view when the map is wider
+  // than its container (e.g. picking the last step from the minimap).
+  useEffect(() => {
+    const box = scrollRef.current;
+    if (!box || !selected) return;
+    const x = selected.kind === "step" ? cx(selected.index) : (cx(selected.index - 1) + cx(selected.index)) / 2;
+    const margin = COL_W;
+    if (x - margin < box.scrollLeft || x + margin > box.scrollLeft + box.clientWidth) {
+      box.scrollTo({ left: Math.max(0, x - box.clientWidth / 2), behavior: "smooth" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected]);
 
   function toggle(loc: FlagLocation) {
     setSelected((cur) => (sameLocation(cur, loc) ? null : loc));
@@ -108,7 +122,7 @@ export default function MapView({ sequence, totalSteps }: MapViewProps) {
       <HealthStrip sequence={sequence} pending={pending} onSelectStep={(i) => toggle({ kind: "step", index: i })} />
 
       <div className="map-card">
-        <div className="map-scroll">
+        <div className="map-scroll" ref={scrollRef}>
           <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Journey map by team and channel" style={{ minWidth: width }}>
             {/* lane bands + labels */}
             {Array.from({ length: laneCount }).map((_, l) => (
