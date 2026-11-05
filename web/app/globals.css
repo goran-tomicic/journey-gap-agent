@@ -1509,8 +1509,19 @@ textarea:focus {
   justify-content: flex-end;
 }
 
+.ns-summary-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .ns-view-toggle {
   margin-bottom: 0;
+}
+
+.ns-toggle-all {
+  min-width: 96px;
+  text-align: right;
 }
 
 .ns-view-toggle button {

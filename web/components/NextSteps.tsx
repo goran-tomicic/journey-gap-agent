@@ -200,11 +200,7 @@ export default function NextSteps({
       ) : (
         <>
           <div className="ns-summary">
-            <span>
-              {actions.length} action{actions.length === 1 ? "" : "s"}
-              {quickWins > 0 && ` · ${quickWins} quick win${quickWins === 1 ? "" : "s"}`}
-            </span>
-            <span className="ns-tools">
+            <span className="ns-summary-left">
               <span className="view-toggle ns-view-toggle" role="group" aria-label="Group actions by">
                 {(["list", "team", "matrix"] as View[]).map((v) => (
                   <button key={v} aria-pressed={view === v} onClick={() => setView(v)}>
@@ -212,23 +208,31 @@ export default function NextSteps({
                   </button>
                 ))}
               </span>
+              <span>
+                {actions.length} action{actions.length === 1 ? "" : "s"}
+                {quickWins > 0 && ` · ${quickWins} quick win${quickWins === 1 ? "" : "s"}`}
+              </span>
+            </span>
+            <span className="ns-tools">
               <CopyButton className="ns-toggle-all" label="Copy plan" text={planToMarkdown(data, journeyName)} />
-              {view === "list" && (
-                <button
-                  className="ns-toggle-all"
-                  onClick={() => setOpen(allOpen ? new Set() : new Set(actions.map((a) => a.priority)))}
-                >
-                  {allOpen ? "Collapse all" : "Expand all"}
-                </button>
-              )}
+              {/* Always rendered (hidden outside List) so the other buttons don't move. */}
+              <button
+                className="ns-toggle-all"
+                style={view === "list" ? undefined : { visibility: "hidden" }}
+                tabIndex={view === "list" ? 0 : -1}
+                onClick={() => setOpen(allOpen ? new Set() : new Set(actions.map((a) => a.priority)))}
+              >
+                {allOpen ? "Collapse all" : "Expand all"}
+              </button>
               <button
                 className="ns-toggle-all"
                 disabled={loading}
+                aria-busy={loading}
                 onClick={() => {
                   if (window.confirm("Regenerate next steps? This replaces the current ones.")) void generate(true);
                 }}
               >
-                {loading ? "Regenerating…" : "Regenerate"}
+                Regenerate
               </button>
             </span>
           </div>
