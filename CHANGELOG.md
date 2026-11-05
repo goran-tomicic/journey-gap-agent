@@ -10,11 +10,12 @@ Prioritized next steps after an analysis (web app only).
   already have them) and from a "Get next steps" link after a fresh
   analysis. A second Claude call turns the flags into a short action list;
   the model groups flags that share a root cause and does the ranking.
-- Each action: title, what to do, suggested owner, the flags it resolves
-  (step + issue type), and impact / effort scores (1-5) with a one-line
-  reason each. Quick wins (low effort, solid impact) are tagged.
-- The top action is highlighted as "Do this first", with a rationale for
-  why it beats the alternatives.
+- Compact expandable cards ranked 1..N: title, owner, a short
+  what-to-do, and impact / effort shown as 5-segment meters. The first
+  card (marked "start here") opens by default with the rationale for why
+  it comes first; the rest collapse. Expanding a card shows the impact and
+  effort reasons and the flags it clears (step + issue type); "Expand all"
+  toggles every card. Quick wins (low effort, solid impact) are marked.
 - Generated only on click (button on the page), then saved with the report (`nextSteps` in the
   stored JSON), so reopening a report shows it without re-running. History
   shows a "next steps" badge on reports that have them. Reports with no

@@ -968,89 +968,61 @@ textarea:focus {
   margin: 8px 0 12px;
 }
 
-.ns-top {
-  margin-top: 14px;
-  padding: 18px;
-  border: 1.5px solid var(--accent);
-  border-radius: 12px;
-  background: var(--surface);
-}
-
-.ns-top-label {
-  font: 600 11.5px var(--font-body);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 6px;
-}
-
-.ns-title {
-  font: 600 15px var(--font-display);
-}
-
-.ns-what {
-  font: 400 13.5px var(--font-body);
-  line-height: 1.45;
-  margin: 6px 0;
-}
-
-.ns-meta {
+.ns-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font: 400 13px var(--font-body);
   color: var(--muted);
+  margin-bottom: 10px;
 }
 
-.ns-scores {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin: 10px 0 6px;
-}
-
-.ns-reasons {
-  font: 400 12px var(--font-body);
+.ns-toggle-all {
+  border: none;
+  background: transparent;
   color: var(--muted);
-  line-height: 1.5;
+  padding: 4px 0;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.ns-resolves {
-  margin-top: 8px;
-  font: 400 12px var(--font-body);
-  color: var(--muted);
-}
-
-.ns-chip {
-  display: inline-block;
-  margin: 2px 4px 2px 0;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--surface-alt);
-  color: var(--text);
-}
-
-.ns-why {
-  margin: 12px 0 0;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-  font: 400 13.5px var(--font-body);
-  line-height: 1.45;
-}
-
-.ns-list {
+.ns-cards {
   list-style: none;
   padding: 0;
-  margin: 12px 0 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.ns-list li {
-  display: flex;
-  gap: 14px;
-  padding: 16px;
+.ns-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
+  padding: 4px 18px 14px;
+}
+
+.ns-card-first {
+  border-color: var(--text);
+}
+
+.ns-card-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 14px 0 6px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.ns-card-head:hover {
+  border: none;
 }
 
 .ns-rank {
@@ -1058,14 +1030,140 @@ textarea:focus {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--border);
+  background: var(--surface-alt);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font: 600 12px var(--font-body);
 }
 
-.ns-item-body {
+.ns-card-first .ns-rank {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.ns-card-main {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ns-title {
+  font: 600 15px var(--font-display);
+  line-height: 1.3;
+}
+
+.ns-start,
+.ns-quick {
+  margin-left: 10px;
+  font: 500 11.5px var(--font-body);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.ns-start::before {
+  content: "→ ";
+}
+
+.ns-quick::before {
+  content: "· ";
+}
+
+.ns-owner {
+  font: 400 12.5px var(--font-body);
+  color: var(--muted);
+}
+
+.ns-card-side {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.ns-meter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font: 400 11.5px var(--font-body);
+  color: var(--muted);
+}
+
+.ns-meter-bars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.ns-meter-bars span {
+  width: 9px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--border);
+}
+
+.ns-meter-bars span.on {
+  background: var(--text);
+}
+
+.ns-chevron {
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: rotate(45deg);
+  margin: 0 4px 3px 2px;
+  transition: transform 0.15s ease;
+}
+
+.ns-card-open .ns-chevron {
+  transform: rotate(-135deg);
+  margin-bottom: -3px;
+}
+
+.ns-what {
+  margin: 0 0 0 40px;
+  font: 400 13.5px var(--font-body);
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.ns-details {
+  margin: 14px 0 0 40px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px 24px;
+}
+
+.ns-detail-label {
+  font: 600 11px var(--font-body);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.ns-detail p {
+  margin: 0;
+  font: 400 12.5px var(--font-body);
+  line-height: 1.5;
+}
+
+.ns-chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+@media (max-width: 560px) {
+  .ns-card-side {
+    display: none;
+  }
 }
