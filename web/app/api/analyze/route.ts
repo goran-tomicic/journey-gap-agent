@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { NextRequest } from "next/server";
 import { parseTouchpointsCsv, streamGapReport } from "../../../../src/lib/gapReport.js";
-import { saveReport } from "../../../lib/reportStore.js";
+import { getReport, saveReport } from "../../../lib/reportStore.js";
 import type { GapReport, StepResult, Touchpoint } from "../../../../src/types.js";
 
 type ProgressEvent =
@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
       let csvText: string | undefined;
       let manual: Touchpoint[] | undefined;
       let sourceName: string;
+      let revisionOf: string | undefined;
       try {
         let form: FormData;
         try {
@@ -71,6 +72,11 @@ export async function POST(req: NextRequest) {
         }
         const file = form.get("file");
         const useSample = form.get("useSample") === "true";
+        const revision = form.get("revisionOf");
+        if (typeof revision === "string" && revision) {
+          if (!getReport(revision)) throw new Error("The report being revised was not found.");
+          revisionOf = revision;
+        }
         const manualJson = form.get("touchpoints");
 
         if (typeof manualJson === "string") {
@@ -117,7 +123,7 @@ export async function POST(req: NextRequest) {
         const gapReport = await streamGapReport(touchpoints, { apiKey, model }, (sequence, summary) => {
           send({ type: "progress", sequence, summary });
         });
-        const stored = saveReport(sourceName, gapReport);
+        const stored = saveReport(sourceName, gapReport, { touchpoints, revisionOf });
         send({ type: "done", id: stored.id, report: gapReport });
       } catch (err) {
         console.error(err);

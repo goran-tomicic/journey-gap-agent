@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import RevisionCompare from "../../../components/RevisionCompare";
 import ReportTabs from "../../../components/ReportTabs";
 import ReportView from "../../../components/ReportView";
 import { getReport } from "../../../lib/reportStore.js";
@@ -10,6 +11,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   const stored = getReport(id);
   if (!stored) notFound();
+  const original = stored.revisionOf ? getReport(stored.revisionOf) : null;
 
   return (
     <div className="page">
@@ -21,6 +23,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
       </div>
       <h1>{stored.sourceName}</h1>
       <div className="subtitle">{new Date(stored.createdAt).toLocaleString()}</div>
+      {original && <RevisionCompare original={original} revised={stored} />}
       <ReportTabs id={stored.id} active="report" hasNextSteps={!!stored.nextSteps} />
       <ReportView summary={stored.report.summary} sequence={stored.report.sequence} />
     </div>

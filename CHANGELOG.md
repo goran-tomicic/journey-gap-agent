@@ -2,6 +2,30 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/apply-revise
+Apply proposed changes and re-analyze (phase 3 of the next-steps v2 spec).
+
+- Next-step actions can carry a minimal `proposed_change`: add a step
+  (name, team, channel, placed after an existing step) or assign a single
+  owner to an existing step. Proposals are validated against the report's
+  real step names (case-insensitive match, normalized to the exact name);
+  anything that doesn't match is dropped to "none" and never offered.
+- Cards show the proposed change with Apply / Applied (undo); selections are
+  remembered per report in the browser and reset when next steps are
+  regenerated. "Revise journey (N)" builds the revised journey (inferred
+  order, descriptions kept where the original input was stored) and opens
+  it in the manual journey form at the steps stage, with a note, to review
+  and edit before analyzing.
+- Analyzing a revision saves it with `revisionOf` (validated) and the input
+  `touchpoints` (now stored for every new report). The revision's report
+  page opens with a before/after panel: counts side by side (steps, flags,
+  missing steps, ownership issues, unbridged handoffs) and both flag lists.
+  Flags are listed, not matched one-to-one, since the model words and
+  numbers the same issue differently between runs.
+- Next-steps generation now tolerates the model returning `actions` as a
+  JSON string and retries once on unusable output (seen in a spike where
+  2 of 6 runs of the larger schema returned unparseable actions).
+
 ## feature/next-steps-actions
 Next steps made easier to act on (phase 1 of the next-steps v2 spec).
 

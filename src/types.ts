@@ -38,6 +38,12 @@ export interface ScoredReason {
   reason: string;
 }
 
+/** A concrete, minimal edit to the journey that would fix an action's flags. */
+export type ProposedChange =
+  | { type: "add_step"; new_step_name: string; owning_team: string; channel: string; after_step: string }
+  | { type: "assign_owner"; target_step: string; owning_team: string }
+  | { type: "none" };
+
 export interface NextStepAction {
   /** 1 = do this first. */
   priority: number;
@@ -50,6 +56,8 @@ export interface NextStepAction {
   effort: ScoredReason;
   /** One sentence saying how to verify the fix. Absent on next steps saved before it existed. */
   done_when?: string;
+  /** Absent on older next steps; step names match the report's steps exactly. */
+  proposed_change?: ProposedChange;
 }
 
 export interface NextSteps {

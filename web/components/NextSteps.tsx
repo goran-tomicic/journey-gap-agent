@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import ActionMatrix from "./ActionMatrix";
 import ScoreMeter from "./ScoreMeter";
 import type { IssueType, NextStepAction, NextSteps as NextStepsData } from "../../src/types.js";
 import { actionToTicket, groupByOwner, planToMarkdown } from "../lib/nextStepsText";
+import { applyChanges, buildRevisionDraft, describeChange, DRAFT_KEY } from "../lib/revise";
+import type { BaseStep } from "../lib/revise";
 
 type View = "list" | "team" | "matrix";
 
@@ -42,13 +45,18 @@ function ActionCard({
   onToggle,
   rationale,
   journeyName,
+  applied,
+  onToggleApply,
 }: {
   action: NextStepAction;
   open: boolean;
   onToggle: () => void;
   rationale?: string;
   journeyName?: string;
+  applied: boolean;
+  onToggleApply: () => void;
 }) {
+  const change = action.proposed_change && action.proposed_change.type !== "none" ? action.proposed_change : undefined;
   const first = action.priority === 1;
   return (
     <li className={`ns-card${first ? " ns-card-first" : ""}${open ? " ns-card-open" : ""}`}>
@@ -60,7 +68,10 @@ function ActionCard({
             {first && <span className="ns-start">start here</span>}
             {!first && isQuickWin(action) && <span className="ns-quick">quick win</span>}
           </span>
-          <span className="ns-owner">{action.suggested_owner}</span>
+          <span className="ns-owner">
+            {action.suggested_owner}
+            {change && <span className="ns-change-flag">{applied ? " · change applied" : " · proposes a change"}</span>}
+          </span>
         </span>
         <span className="ns-card-side">
           <ScoreMeter label="Impact" value={action.impact.score} title={action.impact.reason} tone="good" />
@@ -105,7 +116,18 @@ function ActionCard({
               </p>
             </div>
           )}
+          {change && (
+            <div className="ns-detail ns-detail-wide">
+              <div className="ns-detail-label">Proposed change</div>
+              <p>{describeChange(change)}</p>
+            </div>
+          )}
           <div className="ns-detail-wide ns-card-actions">
+            {change && (
+              <button type="button" className={`ns-copy${applied ? "" : " primary"}`} onClick={onToggleApply}>
+                {applied ? "Applied · undo" : "Apply change"}
+              </button>
+            )}
             <CopyButton className="ns-copy" label="Copy as ticket" text={actionToTicket(action, journeyName)} />
           </div>
         </div>
@@ -120,17 +142,42 @@ export default function NextSteps({
   reportId,
   initial,
   journeyName,
+  baseSteps,
 }: {
   reportId: string;
   initial?: NextStepsData;
   journeyName?: string;
+  baseSteps?: BaseStep[];
 }) {
+  const router = useRouter();
   const [data, setData] = useState<NextStepsData | undefined>(initial);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
   const [open, setOpen] = useState<Set<number>>(new Set([1]));
   const [view, setView] = useState<View>("list");
   const [picked, setPicked] = useState<number>(1);
+  const [applied, setApplied] = useState<Set<number>>(new Set());
+  const appliedKey = `journey-gap-applied:${reportId}`;
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(appliedKey) ?? "[]");
+      if (Array.isArray(saved)) setApplied(new Set(saved.filter((n) => typeof n === "number")));
+    } catch {
+      // ignore a corrupt value
+    }
+  }, [appliedKey]);
+
+  function saveApplied(next: Set<number>) {
+    setApplied(next);
+    localStorage.setItem(appliedKey, JSON.stringify([...next]));
+  }
+
+  function toggleApply(priority: number) {
+    const next = new Set(applied);
+    if (!next.delete(priority)) next.add(priority);
+    saveApplied(next);
+  }
 
   async function generate(force = false) {
     setLoading(true);
@@ -146,6 +193,7 @@ export default function NextSteps({
       setData(body.nextSteps);
       setOpen(new Set([1]));
       setPicked(1);
+      saveApplied(new Set()); // a new set of actions invalidates earlier selections
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not generate next steps.");
     } finally {
@@ -189,8 +237,20 @@ export default function NextSteps({
       onToggle={onToggle}
       rationale={a.priority === 1 ? data.top_pick_rationale : undefined}
       journeyName={journeyName}
+      applied={applied.has(a.priority)}
+      onToggleApply={() => toggleApply(a.priority)}
     />
   );
+  const proposals = actions.filter((a) => a.proposed_change && a.proposed_change.type !== "none");
+  const chosen = actions.filter((a) => applied.has(a.priority) && proposals.includes(a));
+
+  function reviseJourney() {
+    if (!baseSteps || chosen.length === 0) return;
+    const draft = buildRevisionDraft(journeyName ?? "Journey", reportId, applyChanges(baseSteps, chosen), chosen.length);
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    router.push("/");
+  }
+
   const pickedAction = actions.find((a) => a.priority === picked) ?? actions[0];
 
   return (
@@ -237,6 +297,18 @@ export default function NextSteps({
             </span>
           </div>
           {error && <div className="error">{error}</div>}
+
+          {baseSteps && proposals.length > 0 && (
+            <div className="ns-revise">
+              <span>
+                {proposals.length} action{proposals.length === 1 ? "" : "s"} propose a change to the journey.
+                Apply the ones you want, then re-analyze the revised journey to see what improves.
+              </span>
+              <button className="primary" disabled={chosen.length === 0} onClick={reviseJourney}>
+                Revise journey{chosen.length > 0 ? ` (${chosen.length})` : ""}
+              </button>
+            </div>
+          )}
 
           {view === "list" && (
             <ol className="ns-cards">

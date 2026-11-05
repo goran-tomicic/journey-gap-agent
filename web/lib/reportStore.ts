@@ -1,6 +1,6 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import type { GapReport, NextSteps } from "../../src/types.js";
+import type { GapReport, NextSteps, Touchpoint } from "../../src/types.js";
 
 export interface StoredReport {
   id: string;
@@ -9,6 +9,10 @@ export interface StoredReport {
   report: GapReport;
   /** Present once the user has generated next steps for this report. */
   nextSteps?: NextSteps;
+  /** The input the analysis ran on (absent on reports saved before this was stored). */
+  touchpoints?: Touchpoint[];
+  /** Id of the report this one revises, when it was run from applied next steps. */
+  revisionOf?: string;
 }
 
 // Reports persist to plain JSON files under <repo root>/data/reports, next
@@ -20,13 +24,18 @@ function ensureDir(): void {
   mkdirSync(REPORTS_DIR, { recursive: true });
 }
 
-export function saveReport(sourceName: string, report: GapReport): StoredReport {
+export function saveReport(
+  sourceName: string,
+  report: GapReport,
+  extras: { touchpoints?: Touchpoint[]; revisionOf?: string } = {},
+): StoredReport {
   ensureDir();
   const stored: StoredReport = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     createdAt: new Date().toISOString(),
     sourceName,
     report,
+    ...extras,
   };
   writeFileSync(path.join(REPORTS_DIR, `${stored.id}.json`), JSON.stringify(stored, null, 2));
   return stored;
