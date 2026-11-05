@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { DRAFT_KEY } from "../lib/revise";
 import type { AnalysisRun } from "./useAnalysisRun";
 
 interface StepDraft {
@@ -15,9 +16,12 @@ interface Draft {
   name: string;
   steps: StepDraft[];
   stage: number;
+  /** Set when the draft was built from applied next steps. */
+  revisionOf?: string;
+  note?: string;
 }
 
-const STORAGE_KEY = "journey-gap-draft";
+const STORAGE_KEY = DRAFT_KEY;
 const EMPTY_DRAFT: Draft = { name: "", steps: [], stage: 0 };
 const STAGES = ["Journey", "Steps", "Review"];
 const CHANNEL_SUGGESTIONS = ["Call", "Email", "App", "Internal Tool", "Chat", "Meeting", "Portal", "In person"];
@@ -173,6 +177,7 @@ export default function JourneyForm({ run }: { run: AnalysisRun }) {
   function analyze() {
     const form = new FormData();
     form.set("journeyName", draft.name.trim());
+    if (draft.revisionOf) form.set("revisionOf", draft.revisionOf);
     form.set(
       "touchpoints",
       JSON.stringify(
@@ -221,6 +226,8 @@ export default function JourneyForm({ run }: { run: AnalysisRun }) {
           </li>
         ))}
       </ol>
+
+      {draft.note && draft.stage > 0 && <div className="revision-note">{draft.note}</div>}
 
       {draft.stage === 0 && (
         <>

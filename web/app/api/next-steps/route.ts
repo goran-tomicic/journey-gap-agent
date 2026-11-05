@@ -12,16 +12,20 @@ export async function POST(req: NextRequest) {
   }
 
   let id: unknown;
+  let force = false;
   try {
-    ({ id } = await req.json());
+    const body = await req.json();
+    id = body.id;
+    force = body.force === true;
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
   const stored = typeof id === "string" ? getReport(id) : null;
   if (!stored) return NextResponse.json({ error: "Report not found." }, { status: 404 });
 
-  // Already generated for this report: return the saved result instead of re-running.
-  if (stored.nextSteps) return NextResponse.json({ nextSteps: stored.nextSteps });
+  // Already generated for this report: return the saved result instead of re-running
+  // (unless the user asked to regenerate).
+  if (stored.nextSteps && !force) return NextResponse.json({ nextSteps: stored.nextSteps });
 
   try {
     const model = process.env.CLAUDE_MODEL ?? "claude-sonnet-5";

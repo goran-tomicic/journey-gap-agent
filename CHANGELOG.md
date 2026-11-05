@@ -2,6 +2,43 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/apply-revise
+Apply proposed changes and re-analyze (phase 3 of the next-steps v2 spec).
+
+- Next-step actions can carry a minimal `proposed_change`: add a step
+  (name, team, channel, placed after an existing step) or assign a single
+  owner to an existing step. Proposals are validated against the report's
+  real step names (case-insensitive match, normalized to the exact name);
+  anything that doesn't match is dropped to "none" and never offered.
+- Cards show the proposed change with Apply / Applied (undo); selections are
+  remembered per report in the browser and reset when next steps are
+  regenerated. "Revise journey (N)" builds the revised journey (inferred
+  order, descriptions kept where the original input was stored) and opens
+  it in the manual journey form at the steps stage, with a note, to review
+  and edit before analyzing.
+- Analyzing a revision saves it with `revisionOf` (validated) and the input
+  `touchpoints` (now stored for every new report). The revision's report
+  page opens with a before/after panel: counts side by side (steps, flags,
+  missing steps, ownership issues, unbridged handoffs) and both flag lists.
+  Flags are listed, not matched one-to-one, since the model words and
+  numbers the same issue differently between runs.
+- Next-steps generation now tolerates the model returning `actions` as a
+  JSON string and retries once on unusable output (seen in a spike where
+  2 of 6 runs of the larger schema returned unparseable actions).
+
+## feature/next-steps-actions
+Next steps made easier to act on (phase 1 of the next-steps v2 spec).
+
+- Each action gains a "done when" line (how to verify the fix), shown in
+  the expanded card. Next steps saved before this keep working without it.
+- "Copy as ticket" on each action and "Copy plan" for the whole list: plain
+  Markdown (plan = a checklist per owning team), no network call.
+- Three views of the actions: List (default), By team (the hand-off view,
+  grouped under the suggested owner) and an impact/effort Matrix (numbered
+  dots in a 5x5 grid, quick-win corner shaded, click a dot to open its card).
+- Regenerate button (with confirmation) to re-run next steps on a saved
+  report, e.g. to add "done when" to older ones.
+
 ## feature/journey-map
 Journey map view replaces the Swimlanes view; health summary on both views.
 
