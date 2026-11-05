@@ -914,3 +914,128 @@ textarea:focus {
   font: 600 1.05rem var(--font-display);
   margin-top: 16px;
 }
+
+/* ---- next steps ---- */
+.next-steps {
+  margin-top: 28px;
+}
+
+.ns-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ns-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.ns-hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 8px 0 12px;
+}
+
+.ns-top {
+  margin-top: 14px;
+  padding: 18px;
+  border: 1.5px solid var(--accent);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.ns-top-label {
+  font: 600 11.5px var(--font-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.ns-title {
+  font: 600 15px var(--font-display);
+}
+
+.ns-what {
+  font: 400 13.5px var(--font-body);
+  line-height: 1.45;
+  margin: 6px 0;
+}
+
+.ns-meta {
+  font: 400 13px var(--font-body);
+  color: var(--muted);
+}
+
+.ns-scores {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 10px 0 6px;
+}
+
+.ns-reasons {
+  font: 400 12px var(--font-body);
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.ns-resolves {
+  margin-top: 8px;
+  font: 400 12px var(--font-body);
+  color: var(--muted);
+}
+
+.ns-chip {
+  display: inline-block;
+  margin: 2px 4px 2px 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.ns-why {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font: 400 13.5px var(--font-body);
+  line-height: 1.45;
+}
+
+.ns-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ns-list li {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.ns-rank {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 12px var(--font-body);
+}
+
+.ns-item-body {
+  flex: 1;
+  min-width: 0;
+}

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import NextSteps from "./NextSteps";
 import ReportView from "./ReportView";
 import { useAnalysisRun } from "./useAnalysisRun";
 
@@ -408,9 +409,12 @@ export default function JourneyForm() {
             resolvedStyle
           />
           {run.phase === "done" && run.reportId && (
-            <p style={{ marginTop: 12 }}>
-              Saved. <Link href={`/reports/${run.reportId}`}>View this report</Link>
-            </p>
+            <>
+              <p style={{ marginTop: 12 }}>
+                Saved. <Link href={`/reports/${run.reportId}`}>View this report</Link>
+              </p>
+              <NextSteps key={run.reportId} reportId={run.reportId} />
+            </>
           )}
         </div>
       )}

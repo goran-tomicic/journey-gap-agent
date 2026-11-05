@@ -37,6 +37,7 @@ export default function HomePage() {
                     <div className="history-badges">
                       <span className="pill">{r.report.summary.steps} steps</span>
                       <span className="pill pill-gap">{issueCount} issues</span>
+                      {r.nextSteps && <span className="pill">next steps</span>}
                     </div>
                   </Link>
                 </li>
