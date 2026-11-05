@@ -61,9 +61,7 @@ planted gap, a channel mismatch, and two ownership issues, so there's
 something concrete for the agent to catch.
 
 ## Web app
-A small Next.js app under `web/` runs the same agent from the browser:
-upload a CSV (or use the sample journey), view the result as the visual
-timeline, and browse past reports.
+A Next.js app under `web/` runs the same agent from the browser.
 
 ```
 cd web
@@ -75,12 +73,28 @@ Then open http://localhost:3000. Reports persist as JSON files under
 `data/reports/` at the repo root (not committed). The web app reuses the
 same analysis logic as the CLI, from `src/lib/gapReport.ts`.
 
-Analysis streams live: step cards render as skeleton placeholders as soon as
-the CSV is parsed, then fill in with real content (and their gap/ownership/
-channel-mismatch flags) as Claude generates each one, instead of waiting on
-a single blocking response.
+**Input.** Build a journey step by step in a three-stage form (name, steps,
+review; steps can have several owning teams; the draft is kept in the
+browser), or upload a CSV, or run the sample journey.
 
-Gaps and channel mismatches render as a visible break in the connecting
-line — a dashed callout leading to a card with the reasoning — rather than
-a note stacked under the step above. Ownership conflicts show as a badge
-next to the step name instead.
+**Results.** Analysis streams in live, with a loading skeleton and animated
+reveal. Two views, switchable: a step-card **Timeline**, and a **Map** with
+team lanes, a channel track, broken handoffs marked where a step is missing
+or the channel changes with no bridge, and click-to-focus flag details. Both
+sit under a health strip (steps, flags, handoffs, a one-segment-per-step
+minimap). Saved reports are listed in History and open on their own page.
+
+**Next steps.** A report's Next steps tab turns the flags into a ranked
+action list: impact and effort scores with reasons, a "done when" check, a
+"Do this first" rationale, and a List / By team / Impact-effort matrix
+view. Actions can be copied as tickets or as a whole plan. Where an action is
+a concrete step or owner change, it can be applied to build a revised
+journey, re-analyzed, and compared side by side with the original.
+
+## Tests
+```
+npm test
+```
+Unit tests cover the pure helpers (flag and handoff stats, ticket and plan
+text, applying changes to a journey, validating model output). They do not
+call the API.

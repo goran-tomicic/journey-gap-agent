@@ -115,7 +115,7 @@ const text = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 
 /** Models occasionally return a nested field as a JSON string instead of a
  * list. Accept either; anything else (or an unparseable string) is unusable. */
-function extractActions(input: unknown): NextStepAction[] | null {
+export function extractActions(input: unknown): NextStepAction[] | null {
   let actions = (input as { actions?: unknown } | null)?.actions;
   if (typeof actions === "string") {
     try {
@@ -130,7 +130,7 @@ function extractActions(input: unknown): NextStepAction[] | null {
 /** Keeps a proposed change only if it is well-formed and refers to steps that
  * really exist (matched case-insensitively, then normalized to the exact
  * name). Anything else becomes undefined, so a bad proposal is never offered. */
-function validateChange(raw: unknown, stepNames: string[]): ProposedChange | undefined {
+export function validateChange(raw: unknown, stepNames: string[]): ProposedChange | undefined {
   const c = (raw ?? {}) as Record<string, unknown>;
   const exact = (name: unknown) => stepNames.find((n) => n.toLowerCase() === text(name).toLowerCase());
   if (c.type === "add_step") {
