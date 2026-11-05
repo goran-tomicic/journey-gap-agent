@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import NextSteps from "./NextSteps";
 import ReportView from "./ReportView";
 import { useAnalysisRun } from "./useAnalysisRun";
 
@@ -105,12 +104,10 @@ export default function UploadForm() {
             resolvedStyle
           />
           {displayPhase === "done" && reportId && (
-            <>
-              <p style={{ marginTop: 12 }}>
-                Saved. <Link href={`/reports/${reportId}`}>View this report</Link>
-              </p>
-              <NextSteps key={reportId} reportId={reportId} />
-            </>
+            <p style={{ marginTop: 12 }}>
+              Saved. <Link href={`/reports/${reportId}`}>View this report</Link> ·{" "}
+              <Link href={`/reports/${reportId}/next-steps`}>Get next steps &rarr;</Link>
+            </p>
           )}
         </div>
       )}

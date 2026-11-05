@@ -5,15 +5,17 @@ Release notes are added here as each feature is built. One entry per feature bra
 ## feature/next-steps
 Prioritized next steps after an analysis (web app only).
 
-- "Suggest next steps" button under a report (live results and saved
-  reports). A second Claude call turns the flags into a short action list;
+- Dedicated page per report at `/reports/[id]/next-steps`, reached from a
+  Report | Next steps tab bar on saved reports (a dot marks reports that
+  already have them) and from a "Get next steps" link after a fresh
+  analysis. A second Claude call turns the flags into a short action list;
   the model groups flags that share a root cause and does the ranking.
 - Each action: title, what to do, suggested owner, the flags it resolves
   (step + issue type), and impact / effort scores (1-5) with a one-line
   reason each. Quick wins (low effort, solid impact) are tagged.
 - The top action is highlighted as "Do this first", with a rationale for
   why it beats the alternatives.
-- Generated only on click, then saved with the report (`nextSteps` in the
+- Generated only on click (button on the page), then saved with the report (`nextSteps` in the
   stored JSON), so reopening a report shows it without re-running. History
   shows a "next steps" badge on reports that have them. Reports with no
   flags skip the model call.

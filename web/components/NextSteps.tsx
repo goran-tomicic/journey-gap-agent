@@ -82,14 +82,11 @@ export default function NextSteps({ reportId, initial }: { reportId: string; ini
 
   if (!data) {
     return (
-      <div className="next-steps">
-        <div className="ns-header">
-          <h2>Next steps</h2>
-          <button className="primary" onClick={generate} disabled={loading}>
-            {loading ? "Thinking…" : "Suggest next steps"}
-          </button>
-        </div>
+      <div className="next-steps ns-empty">
         <p className="ns-hint">Get a prioritized list of what to fix, and which action is most worth doing first.</p>
+        <button className="primary" onClick={generate} disabled={loading}>
+          {loading ? "Thinking…" : "Suggest next steps"}
+        </button>
         {loading && (
           <div style={{ display: "flex", alignItems: "center", gap: 8, font: "500 13px var(--font-body)" }}>
             <span className="pulse-dot" /> Prioritizing actions…
@@ -103,9 +100,6 @@ export default function NextSteps({ reportId, initial }: { reportId: string; ini
   const [top, ...rest] = data.actions;
   return (
     <div className="next-steps">
-      <div className="ns-header">
-        <h2>Next steps</h2>
-      </div>
       {!top ? (
         <p className="ns-hint">{data.top_pick_rationale}</p>
       ) : (
