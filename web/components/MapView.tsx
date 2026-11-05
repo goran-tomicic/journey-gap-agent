@@ -92,7 +92,6 @@ export default function MapView({ sequence, totalSteps }: MapViewProps) {
 
   const visibleFlags = flags
     .filter((f) => !hidden.has(f.kind))
-    .filter((f) => !selected || sameLocation(f.location, selected))
     .sort((a, b) => b.score - a.score || a.location.index - b.location.index);
 
   const counts: Record<FlagKind, number> = { gap: 0, conflict: 0, mismatch: 0 };
@@ -275,42 +274,45 @@ export default function MapView({ sequence, totalSteps }: MapViewProps) {
         </div>
       </div>
 
-      <div className="flag-panel">
+      <div className="flag-panel" style={pending > 0 ? { minHeight: 220 } : undefined}>
         <div className="flag-panel-head">
-          {selectedTitle ? (
-            <>
-              <div className="flag-selected">{selectedTitle}</div>
-              <button className="flag-clear" onClick={() => setSelected(null)}>
-                Show all
+          <div className="flag-filters" role="group" aria-label="Filter flags">
+            {(["gap", "conflict", "mismatch"] as FlagKind[]).map((k) => (
+              <button
+                key={k}
+                className="flag-filter"
+                aria-pressed={!hidden.has(k)}
+                onClick={() =>
+                  setHidden((h) => {
+                    const next = new Set(h);
+                    if (!next.delete(k)) next.add(k);
+                    return next;
+                  })
+                }
+              >
+                <span className="legend-dot" style={{ background: KIND_VAR[k] }} />
+                {k === "gap" ? "missing step" : k === "conflict" ? "ownership" : "no bridge"} · {counts[k]}
               </button>
-            </>
-          ) : (
-            <div className="flag-filters" role="group" aria-label="Filter flags">
-              {(["gap", "conflict", "mismatch"] as FlagKind[]).map((k) => (
-                <button
-                  key={k}
-                  className="flag-filter"
-                  aria-pressed={!hidden.has(k)}
-                  onClick={() =>
-                    setHidden((h) => {
-                      const next = new Set(h);
-                      if (!next.delete(k)) next.add(k);
-                      return next;
-                    })
-                  }
-                >
-                  <span className="legend-dot" style={{ background: KIND_VAR[k] }} />
-                  {k === "gap" ? "missing step" : k === "conflict" ? "ownership" : "no bridge"} · {counts[k]}
+            ))}
+          </div>
+          <div className="flag-status">
+            {selectedTitle ? (
+              <>
+                <span className="flag-selected">{selectedTitle}</span>
+                <button className="flag-clear" onClick={() => setSelected(null)}>
+                  Clear
                 </button>
-              ))}
-            </div>
-          )}
+              </>
+            ) : (
+              <span>Select a step or a flagged handoff on the map to focus its flags.</span>
+            )}
+          </div>
         </div>
 
         {visibleFlags.length === 0 ? (
           <p className="flag-empty">{flags.length === 0 && pending === 0 ? "No flags — this journey looks clean." : "Nothing to show here."}</p>
         ) : (
-          <ul className="flag-rows">
+          <ul className={`flag-rows${selected ? " flag-rows-focus" : ""}`}>
             {visibleFlags.map((f, i) => (
               <FlagRow key={i} flag={f} active={sameLocation(selected, f.location)} onClick={() => toggle(f.location)} />
             ))}

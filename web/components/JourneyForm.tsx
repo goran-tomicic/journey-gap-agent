@@ -287,6 +287,7 @@ export default function JourneyForm({ run }: { run: AnalysisRun }) {
 
           <div className="step-editor">
             <h3>{isEditingExisting ? "Edit step" : `Step ${draft.steps.length + 1}`}</h3>
+            <div className="field-grid">
             <div className="field">
               <label htmlFor="step-name">Step name</label>
               <input
@@ -295,15 +296,6 @@ export default function JourneyForm({ run }: { run: AnalysisRun }) {
                 placeholder="e.g. Kickoff call held"
                 onChange={(e) => setEditing({ ...editing, name: e.target.value })}
               />
-            </div>
-            <div className="field">
-              <label>Owning team(s)</label>
-              <OwnerInput
-                owners={editing.owners}
-                suggestions={teams}
-                onChange={(owners) => setEditing({ ...editing, owners })}
-              />
-              <div className="field-hint">Press Enter to add a team. Add two if ownership is shared; none if nobody owns it.</div>
             </div>
             <div className="field">
               <label htmlFor="step-channel">Channel</label>
@@ -319,6 +311,16 @@ export default function JourneyForm({ run }: { run: AnalysisRun }) {
                   <option key={c} value={c} />
                 ))}
               </datalist>
+            </div>
+            </div>
+            <div className="field">
+              <label>Owning team(s)</label>
+              <OwnerInput
+                owners={editing.owners}
+                suggestions={teams}
+                onChange={(owners) => setEditing({ ...editing, owners })}
+              />
+              <div className="field-hint">Press Enter to add a team. Add two if ownership is shared; none if nobody owns it.</div>
             </div>
             <div className="field">
               <label htmlFor="step-desc">Description (optional)</label>

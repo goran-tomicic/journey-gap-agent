@@ -19,7 +19,7 @@ export default function JourneyInput({ history }: { history: ReactNode }) {
   // chosen file and form state survive "New analysis".
   return (
     <>
-      <div className="narrow" hidden={run.started}>
+      <div hidden={run.started}>
         <div className="eyebrow">Journey analysis</div>
         <h1>Journey Gap Agent</h1>
         <div className="subtitle">
@@ -54,14 +54,17 @@ export default function JourneyInput({ history }: { history: ReactNode }) {
             {run.phase === "error" ? "Analysis failed" : "Journey gap report"}
           </div>
           <h1>{run.label}</h1>
-          {run.running && (
-            <div className="subtitle" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span className="pulse-dot" /> Analyzing…
-            </div>
-          )}
-          {run.phase === "done" && run.reportId && (
+          {run.phase !== "error" && (
             <>
-              <div className="subtitle">Saved to history.</div>
+              <div className="subtitle" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {run.running ? (
+                  <>
+                    <span className="pulse-dot" /> Analyzing…
+                  </>
+                ) : (
+                  "Saved to history."
+                )}
+              </div>
               <ReportTabs id={run.reportId} active="report" hasNextSteps={false} />
             </>
           )}

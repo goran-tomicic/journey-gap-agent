@@ -109,7 +109,7 @@ export default function GapTimeline({ summary, sequence, totalSteps, resolvedSty
   const skeletonCount = Math.max(0, expected - sequence.length);
 
   return (
-    <div className="timeline-view">
+    <div>
       <HealthStrip
         sequence={sequence}
         pending={skeletonCount}

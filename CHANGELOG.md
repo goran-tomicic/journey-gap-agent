@@ -20,8 +20,16 @@ Journey map view replaces the Swimlanes view; health summary on both views.
   high-confidence and unbridged counts), a one-segment-per-step minimap
   coloured by the worst flag at that step (click to jump), and per-type
   counts. Computed from the steps revealed so far, so it fills in live.
-- Report and results pages are wider (map needs the room); the timeline
-  keeps its narrow column. A saved "swimlane" view preference maps to Map.
+- One container width on every page (home, results, report, next steps)
+  and a stable scrollbar gutter, so switching pages or views no longer
+  shifts the layout sideways.
+- Selecting a step or flag in the Map no longer filters the flag list;
+  the matching flags are highlighted and the rest dimmed, with a fixed
+  status line, so nothing jumps. The report tabs show (disabled) while an
+  analysis is still running, so they don't pop in at the end.
+- Style pass: shared corner-radius tokens for cards and controls, and the
+  step form puts name and channel side by side.
+- A saved "swimlane" view preference maps to Map.
 
 ## feature/next-steps
 Prioritized next steps after an analysis (web app only).
