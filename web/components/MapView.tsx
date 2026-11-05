@@ -136,7 +136,7 @@ export default function MapView({ sequence, totalSteps }: MapViewProps) {
               const color = broken ? (hasGap ? KIND_VAR.gap : KIND_VAR.mismatch) : undefined;
               const isSel = sameLocation(selected, loc);
               return (
-                <g key={i} opacity={dim(loc)}>
+                <g key={i} opacity={dim(loc)} className="map-enter-fade">
                   <path
                     d={d}
                     className={broken ? "map-edge map-edge-broken" : "map-edge"}
@@ -182,7 +182,7 @@ export default function MapView({ sequence, totalSteps }: MapViewProps) {
               return (
                 <g
                   key={i}
-                  className="map-hit"
+                  className="map-hit map-enter-pop"
                   opacity={dim(loc)}
                   role="button"
                   tabIndex={0}
@@ -227,8 +227,8 @@ export default function MapView({ sequence, totalSteps }: MapViewProps) {
               const max = Math.floor((w - 12) / 6.4);
               const label = seg.channel.length > max ? seg.channel.slice(0, Math.max(1, max - 1)) + "…" : seg.channel;
               return (
-                <g key={k}>
-                  <rect x={x} y={trackY} width={w} height={TRACK_H} rx={7} fill={channelColor(seg.channel)} />
+                <g key={k} className="map-enter-fade">
+                  <rect x={x} y={trackY} width={w} height={TRACK_H} rx={7} fill={channelColor(seg.channel)} className="map-seg-rect" style={{ width: w }} />
                   <text x={x + 9} y={trackY + 15} className="map-channel-label">
                     {label}
                   </text>
@@ -239,12 +239,12 @@ export default function MapView({ sequence, totalSteps }: MapViewProps) {
               .filter((f) => f.kind === "mismatch")
               .map((f, k) => {
                 const x = (cx(f.location.index - 1) + cx(f.location.index)) / 2;
-                return <path key={k} d={`M ${x - 6} ${trackY - 9} L ${x + 6} ${trackY - 9} L ${x} ${trackY - 1} Z`} fill={KIND_VAR.mismatch} />;
+                return <path key={k} className="map-enter-fade" d={`M ${x - 6} ${trackY - 9} L ${x + 6} ${trackY - 9} L ${x} ${trackY - 1} Z`} fill={KIND_VAR.mismatch} />;
               })}
 
             {/* step names */}
             {sequence.map((s, i) => (
-              <text key={i} x={cx(i)} y={labelY} textAnchor="middle" className="map-step-label" opacity={dim({ kind: "step", index: i })}>
+              <text key={i} x={cx(i)} y={labelY} textAnchor="middle" className="map-step-label map-enter-fade" opacity={dim({ kind: "step", index: i })}>
                 {wrapLabel(s.step_name).map((line, k) => (
                   <tspan key={k} x={cx(i)} dy={k === 0 ? 0 : 14}>
                     {line}
@@ -313,8 +313,8 @@ export default function MapView({ sequence, totalSteps }: MapViewProps) {
           <p className="flag-empty">{flags.length === 0 && pending === 0 ? "No flags — this journey looks clean." : "Nothing to show here."}</p>
         ) : (
           <ul className={`flag-rows${selected ? " flag-rows-focus" : ""}`}>
-            {visibleFlags.map((f, i) => (
-              <FlagRow key={i} flag={f} active={sameLocation(selected, f.location)} onClick={() => toggle(f.location)} />
+            {visibleFlags.map((f) => (
+              <FlagRow key={`${f.kind}:${f.location.kind}${f.location.index}:${f.issue.description.slice(0, 24)}`} flag={f} active={sameLocation(selected, f.location)} onClick={() => toggle(f.location)} />
             ))}
           </ul>
         )}

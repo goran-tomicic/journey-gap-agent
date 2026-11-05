@@ -1420,3 +1420,82 @@ textarea:focus {
   opacity: 0.45;
   cursor: default;
 }
+
+/* ---- entrance transitions ---- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes seg-in {
+  from {
+    opacity: 0;
+    transform: scaleY(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tab,
+.minimap-seg,
+.map-node,
+.map-edge,
+.flag-row {
+  transition: opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, stroke-width 0.2s ease;
+}
+
+.map-seg-rect {
+  transition: width 0.4s ease;
+}
+
+/* `backwards` (not `both`) so the end state falls back to the element's own
+   opacity, which the map uses to dim unfocused items. */
+@media (prefers-reduced-motion: no-preference) {
+  .results-enter {
+    animation: rise 0.4s ease-out backwards;
+  }
+
+  .timeline > div,
+  .flag-rows > li,
+  .ns-cards > li {
+    animation: rise 0.4s ease-out backwards;
+  }
+
+  .map-enter-fade {
+    animation: fade-in 0.45s ease-out backwards;
+  }
+
+  .map-enter-pop {
+    animation: pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .minimap-seg:not(.minimap-pending) {
+    animation: seg-in 0.35s ease-out backwards;
+    transform-origin: center;
+  }
+
+  .health-tile {
+    transition: border-color 0.3s ease;
+  }
+}

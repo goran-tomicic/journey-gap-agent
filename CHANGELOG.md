@@ -29,6 +29,11 @@ Journey map view replaces the Swimlanes view; health summary on both views.
   analysis is still running, so they don't pop in at the end.
 - Style pass: shared corner-radius tokens for cards and controls, and the
   step form puts name and channel side by side.
+- Smoother reveal while an analysis streams in: results view fades in,
+  timeline cards, flag rows and next-step cards rise in, map nodes pop in,
+  handoffs, channel segments and labels fade in (the channel bar grows
+  smoothly as steps are added), and minimap segments grow in. All
+  entrance motion is skipped for users who prefer reduced motion.
 - A saved "swimlane" view preference maps to Map.
 
 ## feature/next-steps

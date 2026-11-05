@@ -46,7 +46,7 @@ export default function JourneyInput({ history }: { history: ReactNode }) {
       </div>
 
       {run.started && (
-        <div>
+        <div className="results-enter">
           <button className="back-link back-link-button" onClick={run.reset}>
             &larr; New analysis
           </button>
