@@ -1,13 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useState } from "react";
-import ReportView from "./ReportView";
-import { useAnalysisRun } from "./useAnalysisRun";
+import type { AnalysisRun } from "./useAnalysisRun";
 
-export default function UploadForm() {
+export default function UploadForm({ run }: { run: AnalysisRun }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const run = useAnalysisRun();
 
   const [fileName, setFileName] = useState<string>();
   const [dragActive, setDragActive] = useState(false);
@@ -20,7 +17,7 @@ export default function UploadForm() {
     const form = new FormData();
     if (useSample) form.set("useSample", "true");
     else if (file) form.set("file", file);
-    void run.start(form);
+    void run.start(form, useSample ? "Sample journey" : file?.name ?? "CSV upload");
   }
 
   function handleFileChosen(file: File | undefined) {
@@ -40,18 +37,11 @@ export default function UploadForm() {
     }
   }
 
-  const { running, showResults: showTimeline, phase: displayPhase, error, summary, total, revealed, revealedCount, reportId } = run;
+  const { running, phase, error } = run;
 
   return (
     <div className="panel">
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <h2>Run analysis</h2>
-        {running && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, font: "500 13px var(--font-body)", color: "var(--accent)" }}>
-            <span className="pulse-dot" /> Analyzing…
-          </div>
-        )}
-      </div>
+      <h2>Run analysis</h2>
 
       {!running && (
         <div
@@ -93,24 +83,7 @@ export default function UploadForm() {
         </div>
       )}
 
-      {displayPhase === "error" && <div className="error">{error}</div>}
-
-      {showTimeline && (
-        <div style={{ marginTop: 20 }}>
-          <ReportView
-            summary={summary}
-            sequence={revealed}
-            totalSteps={displayPhase === "running" ? total : revealedCount}
-            resolvedStyle
-          />
-          {displayPhase === "done" && reportId && (
-            <p style={{ marginTop: 12 }}>
-              Saved. <Link href={`/reports/${reportId}`}>View this report</Link> ·{" "}
-              <Link href={`/reports/${reportId}/next-steps`}>Get next steps &rarr;</Link>
-            </p>
-          )}
-        </div>
-      )}
+      {phase === "error" && <div className="error">{error}</div>}
     </div>
   );
 }

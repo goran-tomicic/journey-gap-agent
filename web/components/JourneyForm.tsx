@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import ReportView from "./ReportView";
-import { useAnalysisRun } from "./useAnalysisRun";
+import type { AnalysisRun } from "./useAnalysisRun";
 
 interface StepDraft {
   id: string;
@@ -90,8 +88,7 @@ function OwnerInput({
   );
 }
 
-export default function JourneyForm() {
-  const run = useAnalysisRun();
+export default function JourneyForm({ run }: { run: AnalysisRun }) {
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [loaded, setLoaded] = useState(false);
   const [editing, setEditing] = useState<StepDraft>(emptyStep);
@@ -187,7 +184,7 @@ export default function JourneyForm() {
         })),
       ),
     );
-    void run.start(form);
+    void run.start(form, draft.name.trim());
   }
 
   function downloadCsv() {
@@ -205,15 +202,9 @@ export default function JourneyForm() {
     <div className="panel">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <h2>Describe your journey</h2>
-        {run.running ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, font: "500 13px var(--font-body)", color: "var(--accent)" }}>
-            <span className="pulse-dot" /> Analyzing…
-          </div>
-        ) : (
-          <button type="button" onClick={startNew} disabled={!hasContent}>
-            New
-          </button>
-        )}
+        <button type="button" onClick={startNew} disabled={!hasContent}>
+          New
+        </button>
       </div>
 
       <ol className="stepper">
@@ -222,7 +213,6 @@ export default function JourneyForm() {
             <button
               type="button"
               className={`stepper-item${draft.stage === i ? " stepper-current" : ""}`}
-              disabled={run.running}
               onClick={() => goTo(i)}
             >
               <span className="stepper-num">{i + 1}</span>
@@ -381,7 +371,7 @@ export default function JourneyForm() {
             ))}
           </ol>
           {run.phase === "error" && <div className="error">{run.error}</div>}
-          {!run.running && (
+          {(
             <div className="form-row" style={{ justifyContent: "space-between" }}>
               <button type="button" onClick={() => goTo(1)}>
                 Back to steps
@@ -397,23 +387,6 @@ export default function JourneyForm() {
             </div>
           )}
         </>
-      )}
-
-      {run.showResults && (
-        <div style={{ marginTop: 20 }}>
-          <ReportView
-            summary={run.summary}
-            sequence={run.revealed}
-            totalSteps={run.phase === "running" ? run.total : run.revealedCount}
-            resolvedStyle
-          />
-          {run.phase === "done" && run.reportId && (
-            <p style={{ marginTop: 12 }}>
-              Saved. <Link href={`/reports/${run.reportId}`}>View this report</Link> ·{" "}
-              <Link href={`/reports/${run.reportId}/next-steps`}>Get next steps &rarr;</Link>
-            </p>
-          )}
-        </div>
       )}
     </div>
   );

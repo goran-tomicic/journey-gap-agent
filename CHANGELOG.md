@@ -5,6 +5,11 @@ Release notes are added here as each feature is built. One entry per feature bra
 ## feature/next-steps
 Prioritized next steps after an analysis (web app only).
 
+- Starting an analysis (CSV or manual form) now switches the home page to
+  a results view of its own: the input, toggle and history are hidden, the
+  report streams in with the loading skeleton, and when it finishes the
+  Report | Next steps tabs appear. "New analysis" returns to the input,
+  which keeps its state.
 - Dedicated page per report at `/reports/[id]/next-steps`, reached from a
   Report | Next steps tab bar on saved reports (a dot marks reports that
   already have them) and from a "Get next steps" link after a fresh

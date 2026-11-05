@@ -1173,3 +1173,15 @@ textarea:focus {
     display: none;
   }
 }
+
+.back-link-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.back-link-button:hover {
+  border: none;
+  color: var(--text);
+}
