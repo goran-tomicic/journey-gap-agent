@@ -2,6 +2,10 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/upload-first
+- Home page lists "Upload CSV" before "Build manually" and opens on it. A
+  pending revision draft still opens the form.
+
 ## feature/tests-docs
 - `npm test` (Node's built-in test runner via tsx, no new dependencies):
   14 unit tests over the pure helpers: flag/handoff stats and confidence
