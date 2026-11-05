@@ -1,7 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { DRAFT_KEY } from "../lib/revise";
 import JourneyForm from "./JourneyForm";
 import ReportTabs from "./ReportTabs";
 import ReportView from "./ReportView";
@@ -12,8 +13,18 @@ import { useAnalysisRun } from "./useAnalysisRun";
  * once an analysis starts it switches to a results view of its own, with the
  * live skeleton, until the user starts a new analysis. */
 export default function JourneyInput({ history }: { history: ReactNode }) {
-  const [mode, setMode] = useState<"form" | "csv">("form");
+  const [mode, setMode] = useState<"form" | "csv">("csv");
   const run = useAnalysisRun();
+
+  // A pending revision draft (from "Revise journey") lives in the form.
+  useEffect(() => {
+    try {
+      const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? "null");
+      if (draft?.revisionOf) setMode("form");
+    } catch {
+      /* ignore a corrupt draft */
+    }
+  }, []);
 
   // The input forms stay mounted (just hidden) while results show, so the
   // chosen file and form state survive "New analysis".
@@ -23,23 +34,23 @@ export default function JourneyInput({ history }: { history: ReactNode }) {
         <div className="eyebrow">Journey analysis</div>
         <h1>Journey Gap Agent</h1>
         <div className="subtitle">
-          Describe a cross-team journey, or upload a touchpoint CSV, and flag gaps, ownership
+          Upload a touchpoint CSV, or describe a cross-team journey, and flag gaps, ownership
           conflicts, and channel mismatches.
         </div>
 
         <div className="view-toggle" role="group" aria-label="Input method">
-          <button aria-pressed={mode === "form"} onClick={() => setMode("form")}>
-            Build manually
-          </button>
           <button aria-pressed={mode === "csv"} onClick={() => setMode("csv")}>
             Upload CSV
           </button>
-        </div>
-        <div hidden={mode !== "form"}>
-          <JourneyForm run={run} />
+          <button aria-pressed={mode === "form"} onClick={() => setMode("form")}>
+            Build manually
+          </button>
         </div>
         <div hidden={mode !== "csv"}>
           <UploadForm run={run} />
+        </div>
+        <div hidden={mode !== "form"}>
+          <JourneyForm run={run} />
         </div>
 
         {history}
