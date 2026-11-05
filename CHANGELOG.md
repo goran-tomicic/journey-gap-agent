@@ -2,6 +2,15 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/tests-docs
+- `npm test` (Node's built-in test runner via tsx, no new dependencies):
+  14 unit tests over the pure helpers: flag/handoff stats and confidence
+  parsing, ticket and plan Markdown, grouping by owner, applying changes to a
+  journey and building the revision draft, and validation of model output
+  (tolerant `actions` parsing, proposed changes checked against real steps).
+  `extractActions` and `validateChange` are now exported for this.
+- README updated for the web app as it now stands.
+
 ## feature/apply-revise
 Apply proposed changes and re-analyze (phase 3 of the next-steps v2 spec).
 
