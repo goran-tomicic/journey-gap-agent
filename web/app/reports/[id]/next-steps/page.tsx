@@ -22,7 +22,7 @@ export default async function NextStepsPage({ params }: { params: Promise<{ id: 
       <h1>{stored.sourceName}</h1>
       <div className="subtitle">{new Date(stored.createdAt).toLocaleString()}</div>
       <ReportTabs id={stored.id} active="next-steps" hasNextSteps={!!stored.nextSteps} />
-      <NextSteps reportId={stored.id} initial={stored.nextSteps} />
+      <NextSteps reportId={stored.id} initial={stored.nextSteps} journeyName={stored.sourceName} />
     </div>
   );
 }

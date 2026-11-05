@@ -12,7 +12,9 @@ Turn the flags into a short, prioritized list of concrete next steps:
 handoff that also explains a missing step). Every flag should be covered by an \
 action unless it is clearly too minor to act on.
 2. For each action give a title, a one-or-two sentence "what_to_do", a \
-suggested owning team (use teams that appear in the journey where possible), \
+one-sentence "done_when" that says how someone would verify the fix is in \
+place (observable and specific, e.g. "Every signed order form triggers a \
+kickoff-scheduling email within one business day"), a suggested owning team (use teams that appear in the journey where possible), \
 and the flags it resolves (1-based step number as shown, plus issue type).
 3. Score impact (how much journey risk or customer friction it removes, \
 including how many flags it clears and whether it unblocks downstream steps) \
@@ -43,6 +45,7 @@ const NEXT_STEPS_TOOL: Anthropic.Tool = {
             priority: { type: "integer" },
             title: { type: "string" },
             what_to_do: { type: "string" },
+            done_when: { type: "string" },
             suggested_owner: { type: "string" },
             resolves: {
               type: "array",
@@ -66,7 +69,7 @@ const NEXT_STEPS_TOOL: Anthropic.Tool = {
               required: ["score", "reason"],
             },
           },
-          required: ["priority", "title", "what_to_do", "suggested_owner", "resolves", "impact", "effort"],
+          required: ["priority", "title", "what_to_do", "done_when", "suggested_owner", "resolves", "impact", "effort"],
         },
       },
     },

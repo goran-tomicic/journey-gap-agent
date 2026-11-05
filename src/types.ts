@@ -48,6 +48,8 @@ export interface NextStepAction {
   resolves: { step: number; type: IssueType }[];
   impact: ScoredReason;
   effort: ScoredReason;
+  /** One sentence saying how to verify the fix. Absent on next steps saved before it existed. */
+  done_when?: string;
 }
 
 export interface NextSteps {

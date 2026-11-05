@@ -2,6 +2,19 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/next-steps-actions
+Next steps made easier to act on (phase 1 of the next-steps v2 spec).
+
+- Each action gains a "done when" line (how to verify the fix), shown in
+  the expanded card. Next steps saved before this keep working without it.
+- "Copy as ticket" on each action and "Copy plan" for the whole list: plain
+  Markdown (plan = a checklist per owning team), no network call.
+- Three views of the actions: List (default), By team (the hand-off view,
+  grouped under the suggested owner) and an impact/effort Matrix (numbered
+  dots in a 5x5 grid, quick-win corner shaded, click a dot to open its card).
+- Regenerate button (with confirmation) to re-run next steps on a saved
+  report, e.g. to add "done when" to older ones.
+
 ## feature/journey-map
 Journey map view replaces the Swimlanes view; health summary on both views.
 
