@@ -15,7 +15,7 @@ function isQuickWin(a: NextStepAction): boolean {
 
 function Meter({ label, value, title }: { label: string; value: number; title: string }) {
   return (
-    <div className="ns-meter" title={title}>
+    <div className={`ns-meter ns-meter-${label.toLowerCase()}`} title={title}>
       <span className="ns-meter-label">{label}</span>
       <span className="ns-meter-bars" aria-label={`${label} ${value} of 5`}>
         {[1, 2, 3, 4, 5].map((n) => (

@@ -16,12 +16,17 @@ Prioritized next steps after an analysis (web app only).
   it comes first; the rest collapse. Expanding a card shows the impact and
   effort reasons and the flags it clears (step + issue type); "Expand all"
   toggles every card. Quick wins (low effort, solid impact) are marked.
+- Impact meters are green and effort meters amber; titles slightly larger.
 - Generated only on click (button on the page), then saved with the report (`nextSteps` in the
   stored JSON), so reopening a report shows it without re-running. History
   shows a "next steps" badge on reports that have them. Reports with no
   flags skip the model call.
 - New `POST /api/next-steps` and `src/lib/nextSteps.ts`. Actions are kept
   short; drafting full replacement steps remains out of scope.
+- Sample journey (`data/journey.csv`) rewritten with realistic step
+  descriptions and a plausible rollout; same planted issues (shared
+  ownership on the data import, an unowned adoption check-in, handoffs
+  with no bridging step).
 
 ## feature/journey-form
 Guided form to enter a journey in the browser, as an alternative to uploading a CSV.

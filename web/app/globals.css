@@ -19,6 +19,7 @@
   --mismatch: #6d28d9;
   --mismatch-bg: #f2ebfc;
   --mismatch-border: #dcc8f5;
+  --good: #15803d;
 
   --font-display: "Space Grotesk", ui-sans-serif, sans-serif;
   --font-body: "IBM Plex Sans", system-ui, sans-serif;
@@ -46,6 +47,7 @@
     --mismatch: #a78bfa;
     --mismatch-bg: #241a33;
     --mismatch-border: #40305c;
+    --good: #4ade80;
   }
 }
 
@@ -1051,7 +1053,7 @@ textarea:focus {
 }
 
 .ns-title {
-  font: 600 17px var(--font-display);
+  font: 600 19px var(--font-display);
   line-height: 1.35;
 }
 
@@ -1105,7 +1107,11 @@ textarea:focus {
 }
 
 .ns-meter-bars span.on {
-  background: var(--text);
+  background: var(--good);
+}
+
+.ns-meter-effort .ns-meter-bars span.on {
+  background: var(--gap);
 }
 
 .ns-chevron {
