@@ -40,6 +40,8 @@ export function useAnalysisRun() {
   const [summary, setSummary] = useState<Partial<GapReport["summary"]> | undefined>();
   const [reportId, setReportId] = useState<string>();
   const [error, setError] = useState<string>();
+  const [started, setStarted] = useState(false);
+  const [label, setLabel] = useState("");
 
   useEffect(() => {
     return () => {
@@ -80,7 +82,24 @@ export function useAnalysisRun() {
     setDisplayPhase("error");
   }
 
-  async function start(form: FormData) {
+  /** Back to the idle state (e.g. "New analysis"). */
+  function reset() {
+    stopPacer();
+    networkRef.current = IDLE_NETWORK;
+    revealedCountRef.current = 0;
+    setTotal(0);
+    setRevealedCount(0);
+    setSummary(undefined);
+    setReportId(undefined);
+    setError(undefined);
+    setDisplayPhase("idle");
+    setStarted(false);
+  }
+
+  /** `title` names the run on the results view (file name, journey name). */
+  async function start(form: FormData, title = "") {
+    setLabel(title);
+    setStarted(true);
     networkRef.current = { ...IDLE_NETWORK, phase: "running" };
     revealedCountRef.current = 0;
     setTotal(0);
@@ -141,6 +160,9 @@ export function useAnalysisRun() {
   return {
     start,
     fail,
+    reset,
+    started,
+    label,
     phase: displayPhase,
     running: displayPhase === "running",
     showResults: displayPhase === "running" || displayPhase === "done",
@@ -152,3 +174,5 @@ export function useAnalysisRun() {
     revealedCount,
   };
 }
+
+export type AnalysisRun = ReturnType<typeof useAnalysisRun>;

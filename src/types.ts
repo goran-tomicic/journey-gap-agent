@@ -31,3 +31,27 @@ export interface GapReport {
   };
   sequence: StepResult[];
 }
+
+export interface ScoredReason {
+  /** 1 (lowest) to 5 (highest). */
+  score: number;
+  reason: string;
+}
+
+export interface NextStepAction {
+  /** 1 = do this first. */
+  priority: number;
+  title: string;
+  what_to_do: string;
+  suggested_owner: string;
+  /** Flags this action clears; `step` is the 1-based position in the report's sequence. */
+  resolves: { step: number; type: IssueType }[];
+  impact: ScoredReason;
+  effort: ScoredReason;
+}
+
+export interface NextSteps {
+  /** Why the priority-1 action beats the others. */
+  top_pick_rationale: string;
+  actions: NextStepAction[];
+}

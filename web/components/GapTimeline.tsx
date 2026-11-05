@@ -1,4 +1,5 @@
 import type { GapReport, Issue, StepResult } from "../../src/types.js";
+import HealthStrip from "./HealthStrip";
 
 const ISSUE_LABEL: Record<Issue["type"], string> = {
   gap: "GAP",
@@ -108,16 +109,17 @@ export default function GapTimeline({ summary, sequence, totalSteps, resolvedSty
   const skeletonCount = Math.max(0, expected - sequence.length);
 
   return (
-    <>
-      <div className="summary">
-        <span className="pill">{summary?.steps ?? expected} steps</span>
-        <span className="pill pill-gap">{summary?.gaps ?? "…"} gaps</span>
-        <span className="pill pill-conflict">{summary?.ownership_conflicts ?? "…"} ownership conflicts</span>
-        <span className="pill pill-mismatch">{summary?.channel_mismatches ?? "…"} channel mismatches</span>
-      </div>
+    <div>
+      <HealthStrip
+        sequence={sequence}
+        pending={skeletonCount}
+        onSelectStep={(i) =>
+          document.getElementById(`step-${i}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
+        }
+      />
       <div className="timeline">
         {sequence.map((step, i) => (
-          <div key={i}>
+          <div key={i} id={`step-${i}`}>
             {i > 0 && <Connector issues={beforeIssues(step)} />}
             <StepCard step={step} index={i} resolved={resolvedStyle} />
           </div>
@@ -129,6 +131,6 @@ export default function GapTimeline({ summary, sequence, totalSteps, resolvedSty
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }

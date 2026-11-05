@@ -1,12 +1,14 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import type { GapReport } from "../../src/types.js";
+import type { GapReport, NextSteps } from "../../src/types.js";
 
 export interface StoredReport {
   id: string;
   createdAt: string;
   sourceName: string;
   report: GapReport;
+  /** Present once the user has generated next steps for this report. */
+  nextSteps?: NextSteps;
 }
 
 // Reports persist to plain JSON files under <repo root>/data/reports, next
@@ -48,4 +50,12 @@ export function listReports(): StoredReport[] {
     .filter((f) => f.endsWith(".json"))
     .map((f) => JSON.parse(readFileSync(path.join(REPORTS_DIR, f), "utf-8")) as StoredReport)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export function saveNextSteps(id: string, nextSteps: NextSteps): StoredReport | null {
+  const stored = getReport(id);
+  if (!stored) return null;
+  stored.nextSteps = nextSteps;
+  writeFileSync(path.join(REPORTS_DIR, `${id}.json`), JSON.stringify(stored, null, 2));
+  return stored;
 }

@@ -2,6 +2,73 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/journey-map
+Journey map view replaces the Swimlanes view; health summary on both views.
+
+- Map view (Timeline | Map toggle, replacing Swimlanes): team lanes with
+  numbered step nodes, handoffs drawn as connectors that turn dashed and
+  carry a badge where a step is missing (+) or the channel changes with no
+  bridge (≠), a channel track underneath that changes colour at each
+  channel change, and step names under the nodes. Shared ownership shows
+  as a bar across the owning lanes with a highlighted ring.
+- Click a step or a flagged handoff (or a flag row) to focus it: the map
+  dims everything else and the flag panel shows only the flags for that
+  spot. Without a selection the panel lists all flags, sorted by
+  confidence, with filter chips per issue type. Confidence is a 5-segment
+  meter parsed from the model's note.
+- Health strip above both views: steps / flags / handoffs tiles (with
+  high-confidence and unbridged counts), a one-segment-per-step minimap
+  coloured by the worst flag at that step (click to jump), and per-type
+  counts. Computed from the steps revealed so far, so it fills in live.
+- One container width on every page (home, results, report, next steps)
+  and a stable scrollbar gutter, so switching pages or views no longer
+  shifts the layout sideways.
+- Selecting a step or flag in the Map no longer filters the flag list;
+  the matching flags are highlighted and the rest dimmed, with a fixed
+  status line, so nothing jumps. The report tabs show (disabled) while an
+  analysis is still running, so they don't pop in at the end.
+- Style pass: shared corner-radius tokens for cards and controls, and the
+  step form puts name and channel side by side.
+- Smoother reveal while an analysis streams in: results view fades in,
+  timeline cards, flag rows and next-step cards rise in, map nodes pop in,
+  handoffs, channel segments and labels fade in (the channel bar grows
+  smoothly as steps are added), and minimap segments grow in. All
+  entrance motion is skipped for users who prefer reduced motion.
+- When the map is wider than the page, selecting a step or flagged handoff
+  (from the map, minimap or flag list) smoothly scrolls it into view.
+- A saved "swimlane" view preference maps to Map.
+
+## feature/next-steps
+Prioritized next steps after an analysis (web app only).
+
+- Starting an analysis (CSV or manual form) now switches the home page to
+  a results view of its own: the input, toggle and history are hidden, the
+  report streams in with the loading skeleton, and when it finishes the
+  Report | Next steps tabs appear. "New analysis" returns to the input,
+  which keeps its state.
+- Dedicated page per report at `/reports/[id]/next-steps`, reached from a
+  Report | Next steps tab bar on saved reports (a dot marks reports that
+  already have them) and from a "Get next steps" link after a fresh
+  analysis. A second Claude call turns the flags into a short action list;
+  the model groups flags that share a root cause and does the ranking.
+- Compact expandable cards ranked 1..N: title, owner, a short
+  what-to-do, and impact / effort shown as 5-segment meters. The first
+  card (marked "start here") opens by default with the rationale for why
+  it comes first; the rest collapse. Expanding a card shows the impact and
+  effort reasons and the flags it clears (step + issue type); "Expand all"
+  toggles every card. Quick wins (low effort, solid impact) are marked.
+- Impact meters are green and effort meters amber; titles slightly larger.
+- Generated only on click (button on the page), then saved with the report (`nextSteps` in the
+  stored JSON), so reopening a report shows it without re-running. History
+  shows a "next steps" badge on reports that have them. Reports with no
+  flags skip the model call.
+- New `POST /api/next-steps` and `src/lib/nextSteps.ts`. Actions are kept
+  short; drafting full replacement steps remains out of scope.
+- Sample journey (`data/journey.csv`) rewritten with realistic step
+  descriptions and a plausible rollout; same planted issues (shared
+  ownership on the data import, an unowned adoption check-in, handoffs
+  with no bridging step).
+
 ## feature/journey-form
 Guided form to enter a journey in the browser, as an alternative to uploading a CSV.
 

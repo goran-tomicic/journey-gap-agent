@@ -3,18 +3,19 @@
 import { useEffect, useState } from "react";
 import type { ComponentProps } from "react";
 import GapTimeline from "./GapTimeline";
-import SwimlaneView from "./SwimlaneView";
+import MapView from "./MapView";
 
-type Mode = "timeline" | "swimlane";
+type Mode = "timeline" | "map";
 const STORAGE_KEY = "journey-gap-view-mode";
 
-/** Switches between the step-card timeline and the swimlane view. */
+/** Switches between the step-card timeline and the journey map. */
 export default function ReportView(props: ComponentProps<typeof GapTimeline>) {
   const [mode, setMode] = useState<Mode>("timeline");
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === "timeline" || saved === "swimlane") setMode(saved);
+    if (saved === "timeline" || saved === "map") setMode(saved);
+    else if (saved === "swimlane") setMode("map"); // value stored by the old swimlane view
   }, []);
 
   function choose(next: Mode) {
@@ -28,11 +29,11 @@ export default function ReportView(props: ComponentProps<typeof GapTimeline>) {
         <button aria-pressed={mode === "timeline"} onClick={() => choose("timeline")}>
           Timeline
         </button>
-        <button aria-pressed={mode === "swimlane"} onClick={() => choose("swimlane")}>
-          Swimlanes
+        <button aria-pressed={mode === "map"} onClick={() => choose("map")}>
+          Map
         </button>
       </div>
-      {mode === "timeline" ? <GapTimeline {...props} /> : <SwimlaneView {...props} />}
+      {mode === "timeline" ? <GapTimeline {...props} /> : <MapView {...props} />}
     </>
   );
 }
