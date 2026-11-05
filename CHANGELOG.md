@@ -2,6 +2,27 @@
 
 Release notes are added here as each feature is built. One entry per feature branch, newest on top.
 
+## feature/journey-map
+Journey map view replaces the Swimlanes view; health summary on both views.
+
+- Map view (Timeline | Map toggle, replacing Swimlanes): team lanes with
+  numbered step nodes, handoffs drawn as connectors that turn dashed and
+  carry a badge where a step is missing (+) or the channel changes with no
+  bridge (≠), a channel track underneath that changes colour at each
+  channel change, and step names under the nodes. Shared ownership shows
+  as a bar across the owning lanes with a highlighted ring.
+- Click a step or a flagged handoff (or a flag row) to focus it: the map
+  dims everything else and the flag panel shows only the flags for that
+  spot. Without a selection the panel lists all flags, sorted by
+  confidence, with filter chips per issue type. Confidence is a 5-segment
+  meter parsed from the model's note.
+- Health strip above both views: steps / flags / handoffs tiles (with
+  high-confidence and unbridged counts), a one-segment-per-step minimap
+  coloured by the worst flag at that step (click to jump), and per-type
+  counts. Computed from the steps revealed so far, so it fills in live.
+- Report and results pages are wider (map needs the room); the timeline
+  keeps its narrow column. A saved "swimlane" view preference maps to Map.
+
 ## feature/next-steps
 Prioritized next steps after an analysis (web app only).
 

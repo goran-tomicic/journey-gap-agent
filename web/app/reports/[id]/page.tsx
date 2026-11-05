@@ -12,7 +12,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
   if (!stored) notFound();
 
   return (
-    <div className="page">
+    <div className="page-wide">
       <Link href="/" className="back-link">
         &larr; Back
       </Link>

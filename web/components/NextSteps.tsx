@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ScoreMeter from "./ScoreMeter";
 import type { IssueType, NextStepAction, NextSteps as NextStepsData } from "../../src/types.js";
 
 const ISSUE_LABEL: Record<IssueType, string> = {
@@ -11,19 +12,6 @@ const ISSUE_LABEL: Record<IssueType, string> = {
 
 function isQuickWin(a: NextStepAction): boolean {
   return a.effort.score <= 2 && a.impact.score >= 3;
-}
-
-function Meter({ label, value, title }: { label: string; value: number; title: string }) {
-  return (
-    <div className={`ns-meter ns-meter-${label.toLowerCase()}`} title={title}>
-      <span className="ns-meter-label">{label}</span>
-      <span className="ns-meter-bars" aria-label={`${label} ${value} of 5`}>
-        {[1, 2, 3, 4, 5].map((n) => (
-          <span key={n} className={n <= value ? "on" : undefined} />
-        ))}
-      </span>
-    </div>
-  );
 }
 
 function ActionCard({
@@ -51,8 +39,8 @@ function ActionCard({
           <span className="ns-owner">{action.suggested_owner}</span>
         </span>
         <span className="ns-card-side">
-          <Meter label="Impact" value={action.impact.score} title={action.impact.reason} />
-          <Meter label="Effort" value={action.effort.score} title={action.effort.reason} />
+          <ScoreMeter label="Impact" value={action.impact.score} title={action.impact.reason} tone="good" />
+          <ScoreMeter label="Effort" value={action.effort.score} title={action.effort.reason} tone="warn" />
         </span>
         <span className="ns-chevron" aria-hidden="true" />
       </button>

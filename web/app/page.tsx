@@ -8,7 +8,7 @@ export default function HomePage() {
   const reports = listReports();
 
   return (
-    <div className="page">
+    <div className="page-wide">
       <JourneyInput
         history={
           <div className="panel">

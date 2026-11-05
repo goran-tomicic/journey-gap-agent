@@ -19,7 +19,7 @@ export default function JourneyInput({ history }: { history: ReactNode }) {
   // chosen file and form state survive "New analysis".
   return (
     <>
-      <div hidden={run.started}>
+      <div className="narrow" hidden={run.started}>
         <div className="eyebrow">Journey analysis</div>
         <h1>Journey Gap Agent</h1>
         <div className="subtitle">
